@@ -1,0 +1,182 @@
+{
+  "name": "Knowledge Extraction Agent with Microsoft 365",
+  "description": "Agent that extracts structured knowledge from research papers, talks, and repositories using LLM-based analysis. Integrates with Microsoft 365 (SharePoint, OneDrive, Teams) for enterprise knowledge management.",
+  "instructions": "You are a knowledge extraction assistant with Microsoft 365 integration. You help users extract structured knowledge from research artifacts including:\n- Research papers (PDF files) from local storage, SharePoint, or OneDrive\n- Research talks and transcripts (text files)\n- Code and model repositories (GitHub URLs or local paths)\n\nWhen a user provides an artifact, you:\n1. Identify the artifact type (paper, talk, or repository) and source (local, SharePoint, OneDrive)\n2. Extract the content using the appropriate agent\n3. Analyze the content with LLM to produce structured knowledge\n4. Present the results including:\n   - Plain language overview\n   - Technical problem being addressed\n   - Key methods and approach\n   - Primary claims and capabilities\n   - Novelty vs prior work\n   - Limitations and constraints\n   - Potential impact\n   - Confidence assessment\n5. Optionally save artifacts back to SharePoint/OneDrive\n6. Optionally post summaries to Teams channels\n\nYou provide both structured JSON artifacts and human-readable summaries.\n\nFor Microsoft 365 sources:\n- SharePoint: Use site ID and file path\n- OneDrive: Use file path like /Documents/file.pdf\n- Automatically track provenance and metadata\n- Save artifacts to designated libraries\n- Send Teams notifications when requested\n\nBe helpful in guiding users through the extraction process and explaining the extracted knowledge.",
+  "model": {
+    "name": "gpt-4",
+    "max_tokens": 4000,
+    "temperature": 0.3
+  },
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "extract_paper_knowledge",
+        "description": "Extract structured knowledge from a research paper PDF file (local storage)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pdf_path": {
+              "type": "string",
+              "description": "Path to the PDF file to analyze"
+            },
+            "llm_provider": {
+              "type": "string",
+              "enum": ["azure-openai", "openai", "anthropic"],
+              "description": "LLM provider to use for extraction",
+              "default": "azure-openai"
+            }
+          },
+          "required": ["pdf_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "extract_talk_knowledge",
+        "description": "Extract structured knowledge from a research talk or transcript (local storage)",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "transcript_path": {
+              "type": "string",
+              "description": "Path to the transcript file or raw transcript text"
+            },
+            "llm_provider": {
+              "type": "string",
+              "enum": ["azure-openai", "openai", "anthropic"],
+              "description": "LLM provider to use for extraction",
+              "default": "azure-openai"
+            }
+          },
+          "required": ["transcript_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "extract_repository_knowledge",
+        "description": "Extract structured knowledge from a code or model repository",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "repo_input": {
+              "type": "string",
+              "description": "GitHub URL or local repository path"
+            },
+            "llm_provider": {
+              "type": "string",
+              "enum": ["azure-openai", "openai", "anthropic"],
+              "description": "LLM provider to use for extraction",
+              "default": "azure-openai"
+            }
+          },
+          "required": ["repo_input"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "extract_from_sharepoint",
+        "description": "Extract knowledge from a document stored in SharePoint. Automatically saves artifact to SharePoint Knowledge Artifacts library and optionally sends Teams notification.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "site_id": {
+              "type": "string",
+              "description": "SharePoint site ID (e.g., 'contoso.sharepoint.com,abc-123,def-456')"
+            },
+            "file_path": {
+              "type": "string",
+              "description": "Path to file in SharePoint (e.g., '/Shared Documents/paper.pdf')"
+            },
+            "llm_provider": {
+              "type": "string",
+              "enum": ["azure-openai", "openai", "anthropic"],
+              "description": "LLM provider to use for extraction",
+              "default": "azure-openai"
+            },
+            "save_to_sharepoint": {
+              "type": "boolean",
+              "description": "Save extracted artifact back to SharePoint",
+              "default": true
+            },
+            "notify_teams": {
+              "type": "boolean",
+              "description": "Post notification to Teams channel",
+              "default": false
+            },
+            "team_id": {
+              "type": "string",
+              "description": "Teams team ID (required if notify_teams=true)"
+            },
+            "channel_id": {
+              "type": "string",
+              "description": "Teams channel ID (required if notify_teams=true)"
+            }
+          },
+          "required": ["site_id", "file_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "extract_from_onedrive",
+        "description": "Extract knowledge from a document stored in OneDrive. Automatically saves artifact back to OneDrive Knowledge Artifacts folder.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to file in OneDrive (e.g., '/Documents/paper.pdf')"
+            },
+            "llm_provider": {
+              "type": "string",
+              "enum": ["azure-openai", "openai", "anthropic"],
+              "description": "LLM provider to use for extraction",
+              "default": "azure-openai"
+            },
+            "save_to_onedrive": {
+              "type": "boolean",
+              "description": "Save extracted artifact back to OneDrive",
+              "default": true
+            }
+          },
+          "required": ["file_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_extraction_status",
+        "description": "Get the status and results of recent knowledge extractions including M365 sources",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Number of recent extractions to return",
+              "default": 5
+            }
+          }
+        }
+      }
+    }
+  ],
+  "capabilities": [
+    "paper_extraction",
+    "talk_extraction",
+    "repository_extraction",
+    "sharepoint_integration",
+    "onedrive_integration",
+    "teams_notifications",
+    "structured_knowledge",
+    "confidence_assessment",
+    "m365_provenance"
+  ]
+}

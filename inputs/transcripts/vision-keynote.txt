@@ -1,0 +1,53 @@
+Title: Advances in Real-Time Computer Vision for Edge Devices
+Speakers: Dr. Jane Doe (Vision Lab), Alex Smith (Edge AI Team)
+Duration: 45 minutes
+Audience: technical
+
+00:00 Introduction
+- Overview of the edge vision problem space
+- Plain-language summary of goals
+
+05:15 Problem Statement
+- Technical problem: low-latency inference under 2W power budget
+- Constraints: limited memory; intermittent connectivity
+
+10:30 Methods & Architecture
+- Pipeline: frame capture → preproc → quantized CNN → postproc
+- Novelty: adaptive quantization + per-layer sparsity scheduling
+- Prior work: MobileNetV2, EfficientNet-lite
+
+15:00 Experimental Results
+- Dataset: COCO subset; 50k images
+- Metrics: mAP@0.5, latency (ms), energy (J/inference)
+- Results: 32ms avg latency; mAP 0.61; 1.8W peak
+
+18:45 Demo (live)
+- Demo type: live on dev board
+- Scenario: object detection on streaming camera; FPS ~30
+- Noted risks: thermals at sustained 40°C ambient
+
+24:00 Technical Challenges
+- On-device thermal throttling effects
+- Model drift when lighting changes
+- Memory fragmentation in long runs
+
+30:10 Open Risks & Mitigations
+- Risk: edge updates bricking devices
+- Mitigation: staged rollout; watchdog recovery
+
+33:20 Pending Experiments & Next Milestones
+- Pending: nighttime dataset; motion blur robustness
+- Next: beta pilot with 50 devices in Q1
+- Collaboration requests: partners with warehouse environments
+
+38:00 Q&A Highlights
+- Audience asked about cost and maintenance SLAs
+- Assumptions: GPU not required; CPU+NPU sufficient
+
+41:00 Ethical/Operational Notes
+- Privacy: all inference on-device; no raw frames stored
+- Governance: opt-in telemetry; license: Apache-2.0 for libs
+
+44:30 Closing
+- Impact: bring real-time detection to constrained edge
+- Future work: cross-device consistency; semi-supervised updates

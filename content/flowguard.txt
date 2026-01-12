@@ -1,0 +1,36 @@
+https://github.com/lpcox/flowguard-demo-public
+
+
+Here are the **logistics details extracted from the page**, focused purely on *when/where/how to find it*:
+
+**Event**
+
+*   **Microsoft Research Showcase 2025**
+
+**Project Identifier**
+
+*   **RRS25-PROJ-020**
+
+**Location**
+
+*   **Building:** 99
+*   **Floor:** 3rd Floor
+*   **Area:** Hallway (showcase area)
+
+**On‑site Guidance**
+
+*   A **hallway / floor map** is provided on the page to help locate the project display.
+
+**Other Practical Notes**
+
+*   Project poster available for download on the page
+*   Standard Microsoft **Event Code of Conduct** and **Data Privacy Notice** apply
+*   Feedback / opt‑out link included (administrative, not on‑site)
+
+If you want, I can:
+
+*   Turn this into a **one‑line attendee directions blurb**
+*   Create a **calendar‑ready location string** (useful for Outlook invites)
+*   Combine this with **talking points** for sharing the project internally
+
+What’s the next thing you want to do with it?

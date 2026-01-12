@@ -1,0 +1,264 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for E1.1
+  postgres:
+    image: postgres:16-alpine
+    container_name: event_agent_postgres
+    environment:
+      POSTGRES_USER: event_agent
+      POSTGRES_PASSWORD: secure_password_123
+      POSTGRES_DB: event_agent_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=en_US.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U event_agent -d event_agent_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - event_agent_network
+
+  # Redis for E2 (Celery broker and cache)
+  redis:
+    image: redis:7-alpine
+    container_name: event_agent_redis
+    command: redis-server --appendonly yes --requirepass redis_password_123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - event_agent_network
+
+  # Neo4j for E4 (Knowledge Graph)
+  neo4j:
+    image: neo4j:5-community
+    container_name: event_agent_neo4j
+    environment:
+      NEO4J_AUTH: neo4j/neo4j_password_123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_pagecache_size: 512m
+      NEO4J_server_memory_heap_initial_size: 512m
+      NEO4J_server_memory_heap_max_size: 1024m
+    volumes:
+      - neo4j_data:/var/lib/neo4j/data
+      - neo4j_logs:/var/lib/neo4j/logs
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - event_agent_network
+
+  # Prometheus for E1.4 Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: event_agent_prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - event_agent_network
+    depends_on:
+      - postgres
+      - redis
+
+  # Main Application (FastAPI)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event_agent_app
+    environment:
+      # Database
+      DATABASE_URL: postgresql://event_agent:secure_password_123@postgres:5432/event_agent_db
+      
+      # Redis
+      REDIS_URL: redis://:redis_password_123@redis:6379/0
+      CELERY_BROKER_URL: redis://:redis_password_123@redis:6379/1
+      CELERY_RESULT_BACKEND: redis://:redis_password_123@redis:6379/2
+      
+      # Neo4j
+      NEO4J_URI: neo4j://neo4j:neo4j_password_123@neo4j:7687
+      
+      # Application
+      ENVIRONMENT: production
+      DEBUG: 'false'
+      LOG_LEVEL: info
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
+      
+      # CORS
+      CORS_ORIGINS: '["http://localhost:3000", "http://localhost:8080"]'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - event_agent_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    command: |
+      sh -c "
+        python -m pip install -r requirements.txt &&
+        alembic upgrade head &&
+        uvicorn knowledge_agent_bot:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # Celery Worker (E2 Async)
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event_agent_celery_worker
+    environment:
+      # Database
+      DATABASE_URL: postgresql://event_agent:secure_password_123@postgres:5432/event_agent_db
+      
+      # Redis
+      REDIS_URL: redis://:redis_password_123@redis:6379/0
+      CELERY_BROKER_URL: redis://:redis_password_123@redis:6379/1
+      CELERY_RESULT_BACKEND: redis://:redis_password_123@redis:6379/2
+      
+      # Neo4j
+      NEO4J_URI: neo4j://neo4j:neo4j_password_123@neo4j:7687
+      
+      # Application
+      ENVIRONMENT: production
+      DEBUG: 'false'
+      LOG_LEVEL: info
+    volumes:
+      - ./:/app
+      - celery_logs:/app/logs
+    networks:
+      - event_agent_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: |
+      sh -c "
+        python -m pip install -r requirements.txt &&
+        celery -A async_execution worker --loglevel=info --concurrency=4
+      "
+
+  # Celery Beat (E2 Scheduled Tasks)
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event_agent_celery_beat
+    environment:
+      # Database
+      DATABASE_URL: postgresql://event_agent:secure_password_123@postgres:5432/event_agent_db
+      
+      # Redis
+      REDIS_URL: redis://:redis_password_123@redis:6379/0
+      CELERY_BROKER_URL: redis://:redis_password_123@redis:6379/1
+      CELERY_RESULT_BACKEND: redis://:redis_password_123@redis:6379/2
+      
+      # Neo4j
+      NEO4J_URI: neo4j://neo4j:neo4j_password_123@neo4j:7687
+      
+      # Application
+      ENVIRONMENT: production
+      DEBUG: 'false'
+      LOG_LEVEL: info
+    volumes:
+      - ./:/app
+      - celery_beat_logs:/app/logs
+    networks:
+      - event_agent_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: |
+      sh -c "
+        python -m pip install -r requirements.txt &&
+        celery -A async_execution beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      "
+
+  # Grafana for E3 Dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: event_agent_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin_password_123}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - event_agent_network
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  app_logs:
+    driver: local
+  celery_logs:
+    driver: local
+  celery_beat_logs:
+    driver: local
+
+networks:
+  event_agent_network:
+    driver: bridge

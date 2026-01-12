@@ -1,0 +1,2386 @@
+openapi: 3.1.0
+info:
+  title: MSR Event Hub API (Graph-aligned, merged + navigation properties)
+  version: 0.3.0
+  description: >
+    Microsoft Graph–aligned resource shapes for MSR Event Hub entities and AI services.
+    Conventions:
+      - Resources use `id` and may include `@odata.type` and `@odata.etag`.
+      - Collection responses use `{ "value": [...] }` and may include `@odata.nextLink`.
+      - Error responses use `{ "error": { "code", "message", ... } }`.
+      - Selected navigation properties are exposed as read-only navigation links and/or embedded objects.
+
+servers:
+  - url: https://eventhub.internal.microsoft.com
+
+tags:
+  - name: Events
+  - name: Sessions
+  - name: Projects
+  - name: Import
+  - name: AI
+
+paths:
+  /v1/hub/configuration:
+    get:
+      tags: [Events]
+      summary: Get hub configuration (homepage curation, defaults)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HubConfiguration"
+        default:
+          $ref: "#/components/responses/GraphError"
+    patch:
+      tags: [Events]
+      summary: Update hub configuration (hub admin)
+      parameters:
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HubConfigurationUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HubConfiguration"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events:
+    get:
+      tags: [Events]
+      summary: List events
+      parameters:
+        - $ref: "#/components/parameters/Top"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/Select"
+        - $ref: "#/components/parameters/OrderBy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventCollectionResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+    post:
+      tags: [Events]
+      summary: Create event (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}:
+    get:
+      tags: [Events]
+      summary: Get event
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Select"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        default:
+          $ref: "#/components/responses/GraphError"
+    patch:
+      tags: [Events]
+      summary: Update event (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        default:
+          $ref: "#/components/responses/GraphError"
+    delete:
+      tags: [Events]
+      summary: Delete event (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/sessions:
+    get:
+      tags: [Sessions]
+      summary: List sessions for an event
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Top"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/Select"
+        - $ref: "#/components/parameters/OrderBy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionCollectionResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+    post:
+      tags: [Sessions]
+      summary: Create session (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/sessions/{sessionId}:
+    get:
+      tags: [Sessions]
+      summary: Get session
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/Select"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        default:
+          $ref: "#/components/responses/GraphError"
+    patch:
+      tags: [Sessions]
+      summary: Update session (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        default:
+          $ref: "#/components/responses/GraphError"
+    delete:
+      tags: [Sessions]
+      summary: Delete session (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/projects:
+    get:
+      tags: [Projects]
+      summary: List projects for an event
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Top"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/Select"
+        - $ref: "#/components/parameters/OrderBy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectCollectionResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+    post:
+      tags: [Projects]
+      summary: Create project (admin or presenter draft)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/projects/{projectId}:
+    get:
+      tags: [Projects]
+      summary: Get project
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/Select"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/GraphError"
+    patch:
+      tags: [Projects]
+      summary: Update project (admin or presenter per permissions)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/GraphError"
+    delete:
+      tags: [Projects]
+      summary: Delete project (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/bookmarks:
+    get:
+      tags: [Projects]
+      summary: List bookmarks for the signed-in user (optionally scoped to an event)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/Top"
+        - $ref: "#/components/parameters/Skip"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/Select"
+        - $ref: "#/components/parameters/OrderBy"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookmarkCollectionResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+    post:
+      tags: [Projects]
+      summary: Create bookmark (signed-in user)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookmarkCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/bookmarks/{bookmarkId}:
+    get:
+      tags: [Projects]
+      summary: Get bookmark
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - name: bookmarkId
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/GraphId" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+        default:
+          $ref: "#/components/responses/GraphError"
+    patch:
+      tags: [Projects]
+      summary: Update bookmark (signed-in user)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - name: bookmarkId
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/GraphId" }
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookmarkUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+        default:
+          $ref: "#/components/responses/GraphError"
+    delete:
+      tags: [Projects]
+      summary: Delete bookmark (signed-in user)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - name: bookmarkId
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/GraphId" }
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/projects/{projectId}/poster:
+    get:
+      tags: [Projects]
+      summary: Get poster (first-class) for a project
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poster"
+        default:
+          $ref: "#/components/responses/GraphError"
+    put:
+      tags: [Projects]
+      summary: Upsert poster for a project (admin or presenter)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PosterUpsertRequest"
+      responses:
+        "200":
+          description: Upserted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poster"
+        default:
+          $ref: "#/components/responses/GraphError"
+    delete:
+      tags: [Projects]
+      summary: Delete poster for a project (admin)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "204":
+          description: Deleted
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/events/{eventId}/projects/{projectId}/knowledge:
+    get:
+      tags: [AI]
+      summary: Get published project knowledge (human-approved)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedProjectKnowledge"
+        default:
+          $ref: "#/components/responses/GraphError"
+    put:
+      tags: [AI]
+      summary: Publish or update project knowledge (event admin / reviewer)
+      parameters:
+        - $ref: "#/components/parameters/EventId"
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishedProjectKnowledgeUpsertRequest"
+      responses:
+        "200":
+          description: Upserted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedProjectKnowledge"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/import/bundle:
+    post:
+      tags: [Import]
+      summary: Import a normalized bundle (Excel/CSV extract -> JSON)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportBundleRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportBundleResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/ai/dosa/summarize:
+    post:
+      tags: [AI]
+      summary: DOSA discovery summary (attendee-facing; fail-closed)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DOSARequest"
+      responses:
+        "200":
+          description: Discovery summary produced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DOSAResponse"
+        "422":
+          description: Fail-closed validation error (Graph error envelope)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphErrorResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+  /v1/ai/pka/extract:
+    post:
+      tags: [AI]
+      summary: PKA artifact extraction (draft-only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PKARequest"
+      responses:
+        "200":
+          description: Draft knowledge artifact produced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PKAResponse"
+        default:
+          $ref: "#/components/responses/GraphError"
+
+components:
+  responses:
+    GraphError:
+      description: Error (Graph-style envelope)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GraphErrorResponse"
+
+  parameters:
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/GraphId" }
+
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/GraphId" }
+
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/GraphId" }
+
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+      description: OData ETag for conditional update.
+
+    Top:
+      name: $top
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 999
+    Skip:
+      name: $skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 1000000
+    Filter:
+      name: $filter
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 4000
+    Select:
+      name: $select
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 2000
+      description: Comma-separated property names.
+    OrderBy:
+      name: $orderby
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 2000
+
+  schemas:
+    # -------------------------
+    # Graph-aligned common shapes
+    # -------------------------
+    GraphId:
+      type: string
+      minLength: 1
+      maxLength: 256
+      description: Unique identifier (Graph style).
+
+    ODataType:
+      type: string
+      pattern: "^#.+\\..+$"
+      description: OData type annotation.
+
+    ODataEtag:
+      type: string
+      minLength: 1
+      maxLength: 512
+      description: OData ETag for concurrency.
+
+    GraphDateTime:
+      type: string
+      format: date-time
+      description: ISO 8601 date-time.
+
+    GraphEntity:
+      type: object
+      additionalProperties: true
+      required: [id]
+      properties:
+        "@odata.type":
+          $ref: "#/components/schemas/ODataType"
+        "@odata.etag":
+          $ref: "#/components/schemas/ODataEtag"
+        id:
+          $ref: "#/components/schemas/GraphId"
+
+    GraphCollectionResponse:
+      type: object
+      additionalProperties: true
+      required: [value]
+      properties:
+        "@odata.context":
+          type: string
+          format: uri
+        "@odata.nextLink":
+          type: string
+          format: uri
+          description: Present when additional pages are available.
+        value:
+          type: array
+          items: {}
+
+    GraphErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: true
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            target:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            innerError:
+              type: object
+              additionalProperties: true
+
+    Url:
+      type: string
+      format: uri
+      minLength: 8
+
+    Email:
+      type: string
+      format: email
+
+    Locale:
+      type: string
+      minLength: 2
+      maxLength: 16
+      pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})?$"
+
+    # -------------------------
+    # People & permissions
+    # -------------------------
+    Person:
+      type: object
+      additionalProperties: false
+      required: [displayName]
+      properties:
+        id:
+          $ref: "#/components/schemas/GraphId"
+          description: Optional (e.g., Entra object id) if known.
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 200
+        jobTitle:
+          type: string
+          maxLength: 200
+        affiliation:
+          type: string
+          maxLength: 200
+        mail:
+          $ref: "#/components/schemas/Email"
+        photoUrl:
+          $ref: "#/components/schemas/Url"
+        profileUrl:
+          $ref: "#/components/schemas/Url"
+
+    PermissionRole:
+      type: string
+      enum: [hubAdmin, eventAdmin, editor, presenter, viewer]
+
+    PermissionBinding:
+      type: object
+      additionalProperties: false
+      required: [role, principal]
+      properties:
+        role:
+          $ref: "#/components/schemas/PermissionRole"
+        principal:
+          type: string
+          minLength: 3
+          maxLength: 256
+          description: Opaque user/group identifier (e.g., Entra object id).
+
+    # -------------------------
+    # Assets & media
+    # -------------------------
+    AssetType:
+      type: string
+      enum: [paper, repo, deck, video, posterPdf, image, projectSite, dataset, other]
+
+    Visibility:
+      type: string
+      enum: [internal, restricted]
+      default: internal
+
+    AssetLink:
+      type: object
+      additionalProperties: false
+      required: [type, webUrl]
+      properties:
+        id:
+          $ref: "#/components/schemas/GraphId"
+        type:
+          $ref: "#/components/schemas/AssetType"
+        displayName:
+          type: string
+          maxLength: 200
+        webUrl:
+          $ref: "#/components/schemas/Url"
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        notes:
+          type: string
+          maxLength: 2000
+
+    Media:
+      type: object
+      additionalProperties: false
+      properties:
+        heroImageUrl:
+          $ref: "#/components/schemas/Url"
+        thumbnailUrl:
+          $ref: "#/components/schemas/Url"
+        posterPdfUrl:
+          $ref: "#/components/schemas/Url"
+        embeddedVideoUrl:
+          $ref: "#/components/schemas/Url"
+
+    # -------------------------
+    # Hub configuration (homepage curation)
+    # -------------------------
+    HubConfiguration:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [featuredEventIds, createdDateTime, lastModifiedDateTime]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubConfiguration"
+            featuredEventIds:
+              type: array
+              items: { $ref: "#/components/schemas/GraphId" }
+              default: []
+              description: Ordered list of events to feature.
+            hubLinks:
+              type: array
+              items: { $ref: "#/components/schemas/AssetLink" }
+              default: []
+            defaults:
+              type: object
+              additionalProperties: false
+              properties:
+                defaultLocale:
+                  $ref: "#/components/schemas/Locale"
+                defaultTimeZone:
+                  type: string
+                  maxLength: 64
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    HubConfigurationUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        featuredEventIds:
+          type: array
+          items: { $ref: "#/components/schemas/GraphId" }
+        hubLinks:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+        defaults:
+          type: object
+          additionalProperties: false
+          properties:
+            defaultLocale:
+              $ref: "#/components/schemas/Locale"
+            defaultTimeZone:
+              type: string
+              maxLength: 64
+
+    # -------------------------
+    # Event Hub core entities
+    # -------------------------
+    EventStatus:
+      type: string
+      enum: [draft, published, archived]
+
+    EventType:
+      type: string
+      enum: [researchShowcase, tab, workshop, lectureSeries, other]
+
+    Track:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id:
+          $ref: "#/components/schemas/GraphId"
+        displayName:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+
+    Theme:
+      type: object
+      additionalProperties: false
+      required: [id, displayName]
+      properties:
+        id:
+          $ref: "#/components/schemas/GraphId"
+        displayName:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+
+    Location:
+      type: object
+      additionalProperties: false
+      properties:
+        displayName:
+          type: string
+          maxLength: 200
+        room:
+          type: string
+          maxLength: 80
+        building:
+          type: string
+          maxLength: 80
+        campus:
+          type: string
+          maxLength: 80
+        address:
+          type: string
+          maxLength: 300
+        floor:
+          type: string
+          maxLength: 40
+        mapUrl:
+          $ref: "#/components/schemas/Url"
+
+    Event:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [displayName, status, type, timeZone, startDate, endDate]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubEvent"
+            displayName:
+              type: string
+              minLength: 1
+              maxLength: 200
+            description:
+              type: string
+              maxLength: 50000
+            status:
+              $ref: "#/components/schemas/EventStatus"
+            type:
+              $ref: "#/components/schemas/EventType"
+            timeZone:
+              type: string
+              minLength: 3
+              maxLength: 64
+              description: IANA timezone (e.g., Asia/Kolkata).
+            locale:
+              $ref: "#/components/schemas/Locale"
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+            venue:
+              $ref: "#/components/schemas/Location"
+            tracks:
+              type: array
+              items: { $ref: "#/components/schemas/Track" }
+              default: []
+            themes:
+              type: array
+              items: { $ref: "#/components/schemas/Theme" }
+              default: []
+            links:
+              type: array
+              items: { $ref: "#/components/schemas/AssetLink" }
+              default: []
+            permissions:
+              type: array
+              items: { $ref: "#/components/schemas/PermissionBinding" }
+              default: []
+            # ---- Navigation properties (Graph-style) ----
+            sessions@odata.navigationLink:
+              type: string
+              format: uri
+              readOnly: true
+              description: URL to sessions collection for this event.
+            projects@odata.navigationLink:
+              type: string
+              format: uri
+              readOnly: true
+              description: URL to projects collection for this event.
+            bookmarks@odata.navigationLink:
+              type: string
+              format: uri
+              readOnly: true
+              description: URL to bookmarks collection for the signed-in user scoped to this event.
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    EventCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [displayName, status, type, timeZone, startDate, endDate]
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 50000
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        type:
+          $ref: "#/components/schemas/EventType"
+        timeZone:
+          type: string
+          minLength: 3
+          maxLength: 64
+        locale:
+          $ref: "#/components/schemas/Locale"
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        venue:
+          $ref: "#/components/schemas/Location"
+        tracks:
+          type: array
+          items: { $ref: "#/components/schemas/Track" }
+          default: []
+        themes:
+          type: array
+          items: { $ref: "#/components/schemas/Theme" }
+          default: []
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+          default: []
+        permissions:
+          type: array
+          items: { $ref: "#/components/schemas/PermissionBinding" }
+          default: []
+
+    EventUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        displayName:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 50000
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        type:
+          $ref: "#/components/schemas/EventType"
+        timeZone:
+          type: string
+          maxLength: 64
+        locale:
+          $ref: "#/components/schemas/Locale"
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        venue:
+          $ref: "#/components/schemas/Location"
+        tracks:
+          type: array
+          items: { $ref: "#/components/schemas/Track" }
+        themes:
+          type: array
+          items: { $ref: "#/components/schemas/Theme" }
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+        permissions:
+          type: array
+          items: { $ref: "#/components/schemas/PermissionBinding" }
+
+    EventCollectionResponse:
+      allOf:
+        - $ref: "#/components/schemas/GraphCollectionResponse"
+        - type: object
+          properties:
+            value:
+              type: array
+              items: { $ref: "#/components/schemas/Event" }
+
+    # -------------------------
+    # Sessions
+    # -------------------------
+    SessionType:
+      type: string
+      enum: [talk, keynote, workshop, panel, lightningTalk, posterSession, other]
+
+    Session:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [eventId, title, sessionType, startDateTime, endDateTime]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubSession"
+            eventId:
+              $ref: "#/components/schemas/GraphId"
+            title:
+              type: string
+              minLength: 1
+              maxLength: 240
+            abstract:
+              type: string
+              maxLength: 10000
+            sessionType:
+              $ref: "#/components/schemas/SessionType"
+            trackId:
+              $ref: "#/components/schemas/GraphId"
+            themeId:
+              $ref: "#/components/schemas/GraphId"
+            speakers:
+              type: array
+              items: { $ref: "#/components/schemas/Person" }
+              default: []
+            moderator:
+              $ref: "#/components/schemas/Person"
+            startDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            endDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            location:
+              $ref: "#/components/schemas/Location"
+            onlineMeetingUrl:
+              $ref: "#/components/schemas/Url"
+            recordingUrl:
+              $ref: "#/components/schemas/Url"
+            assets:
+              type: array
+              items: { $ref: "#/components/schemas/AssetLink" }
+              default: []
+            relatedProjectIds:
+              type: array
+              items: { $ref: "#/components/schemas/GraphId" }
+              default: []
+            visibility:
+              $ref: "#/components/schemas/Visibility"
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    SessionCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [eventId, title, sessionType, startDateTime, endDateTime]
+      properties:
+        eventId:
+          $ref: "#/components/schemas/GraphId"
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        abstract:
+          type: string
+          maxLength: 10000
+        sessionType:
+          $ref: "#/components/schemas/SessionType"
+        trackId:
+          $ref: "#/components/schemas/GraphId"
+        themeId:
+          $ref: "#/components/schemas/GraphId"
+        speakers:
+          type: array
+          items: { $ref: "#/components/schemas/Person" }
+          default: []
+        moderator:
+          $ref: "#/components/schemas/Person"
+        startDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        endDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        location:
+          $ref: "#/components/schemas/Location"
+        onlineMeetingUrl:
+          $ref: "#/components/schemas/Url"
+        recordingUrl:
+          $ref: "#/components/schemas/Url"
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+          default: []
+        relatedProjectIds:
+          type: array
+          items: { $ref: "#/components/schemas/GraphId" }
+          default: []
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    SessionUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          maxLength: 240
+        abstract:
+          type: string
+          maxLength: 10000
+        sessionType:
+          $ref: "#/components/schemas/SessionType"
+        trackId:
+          $ref: "#/components/schemas/GraphId"
+        themeId:
+          $ref: "#/components/schemas/GraphId"
+        speakers:
+          type: array
+          items: { $ref: "#/components/schemas/Person" }
+        moderator:
+          $ref: "#/components/schemas/Person"
+        startDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        endDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        location:
+          $ref: "#/components/schemas/Location"
+        onlineMeetingUrl:
+          $ref: "#/components/schemas/Url"
+        recordingUrl:
+          $ref: "#/components/schemas/Url"
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+        relatedProjectIds:
+          type: array
+          items: { $ref: "#/components/schemas/GraphId" }
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    SessionCollectionResponse:
+      allOf:
+        - $ref: "#/components/schemas/GraphCollectionResponse"
+        - type: object
+          properties:
+            value:
+              type: array
+              items: { $ref: "#/components/schemas/Session" }
+
+    # -------------------------
+    # Projects / posters
+    # -------------------------
+    ResearchMaturity:
+      type: string
+      enum: [exploratory, validated, pilotReady]
+
+    ProjectLifecycleState:
+      type: string
+      enum: [draft, pendingReview, approved, published, archived]
+
+    Project:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [eventId, title, abstract, team, maturity, lifecycleState]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubProject"
+            eventId:
+              $ref: "#/components/schemas/GraphId"
+            humanReadableId:
+              type: string
+              minLength: 3
+              maxLength: 40
+              pattern: "^[A-Z0-9][A-Z0-9-]{2,39}$"
+            title:
+              type: string
+              minLength: 1
+              maxLength: 240
+            abstract:
+              type: string
+              maxLength: 12000
+            themeId:
+              $ref: "#/components/schemas/GraphId"
+            trackId:
+              $ref: "#/components/schemas/GraphId"
+            location:
+              $ref: "#/components/schemas/Location"
+            team:
+              type: array
+              minItems: 1
+              maxItems: 50
+              items: { $ref: "#/components/schemas/Person" }
+            primaryContact:
+              $ref: "#/components/schemas/Person"
+            maturity:
+              $ref: "#/components/schemas/ResearchMaturity"
+            lifecycleState:
+              $ref: "#/components/schemas/ProjectLifecycleState"
+            media:
+              $ref: "#/components/schemas/Media"
+            assets:
+              type: array
+              items: { $ref: "#/components/schemas/AssetLink" }
+              default: []
+            visibility:
+              $ref: "#/components/schemas/Visibility"
+            # ---- Navigation properties (Graph-style) ----
+            poster@odata.navigationLink:
+              type: string
+              format: uri
+              readOnly: true
+              description: URL to poster resource for this project.
+            knowledge@odata.navigationLink:
+              type: string
+              format: uri
+              readOnly: true
+              description: URL to published knowledge resource for this project.
+            # Optional embedded navigation objects (read-only)
+            poster:
+              $ref: "#/components/schemas/Poster"
+              readOnly: true
+            publishedKnowledge:
+              $ref: "#/components/schemas/PublishedProjectKnowledge"
+              readOnly: true
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    ProjectCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [eventId, title, abstract, team, maturity, lifecycleState]
+      properties:
+        eventId:
+          $ref: "#/components/schemas/GraphId"
+        humanReadableId:
+          type: string
+          maxLength: 40
+        title:
+          type: string
+          minLength: 1
+          maxLength: 240
+        abstract:
+          type: string
+          maxLength: 12000
+        themeId:
+          $ref: "#/components/schemas/GraphId"
+        trackId:
+          $ref: "#/components/schemas/GraphId"
+        location:
+          $ref: "#/components/schemas/Location"
+        team:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items: { $ref: "#/components/schemas/Person" }
+        primaryContact:
+          $ref: "#/components/schemas/Person"
+        maturity:
+          $ref: "#/components/schemas/ResearchMaturity"
+        lifecycleState:
+          $ref: "#/components/schemas/ProjectLifecycleState"
+          description: For presenter self-service, starts as draft/pendingReview.
+        media:
+          $ref: "#/components/schemas/Media"
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+          default: []
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    ProjectUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        humanReadableId:
+          type: string
+          maxLength: 40
+        title:
+          type: string
+          maxLength: 240
+        abstract:
+          type: string
+          maxLength: 12000
+        themeId:
+          $ref: "#/components/schemas/GraphId"
+        trackId:
+          $ref: "#/components/schemas/GraphId"
+        location:
+          $ref: "#/components/schemas/Location"
+        team:
+          type: array
+          items: { $ref: "#/components/schemas/Person" }
+        primaryContact:
+          $ref: "#/components/schemas/Person"
+        maturity:
+          $ref: "#/components/schemas/ResearchMaturity"
+        lifecycleState:
+          $ref: "#/components/schemas/ProjectLifecycleState"
+        media:
+          $ref: "#/components/schemas/Media"
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AssetLink" }
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    ProjectCollectionResponse:
+      allOf:
+        - $ref: "#/components/schemas/GraphCollectionResponse"
+        - type: object
+          properties:
+            value:
+              type: array
+              items: { $ref: "#/components/schemas/Project" }
+
+    # -------------------------
+    # Bookmark (QR + personal lists)
+    # -------------------------
+    BookmarkType:
+      type: string
+      enum: [furtherReading, contactMe, followUp, other]
+
+    Bookmark:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [eventId, projectId, userId, createdDateTime]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubBookmark"
+            eventId:
+              $ref: "#/components/schemas/GraphId"
+            projectId:
+              $ref: "#/components/schemas/GraphId"
+            userId:
+              type: string
+              minLength: 3
+              maxLength: 256
+              description: Signed-in user identifier (opaque).
+            bookmarkType:
+              $ref: "#/components/schemas/BookmarkType"
+            tags:
+              type: array
+              items: { type: string, maxLength: 40 }
+              default: []
+            note:
+              type: string
+              maxLength: 2000
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    BookmarkCreateRequest:
+      type: object
+      additionalProperties: false
+      required: [projectId]
+      properties:
+        projectId:
+          $ref: "#/components/schemas/GraphId"
+        bookmarkType:
+          $ref: "#/components/schemas/BookmarkType"
+        tags:
+          type: array
+          items: { type: string, maxLength: 40 }
+          default: []
+        note:
+          type: string
+          maxLength: 2000
+
+    BookmarkUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        bookmarkType:
+          $ref: "#/components/schemas/BookmarkType"
+        tags:
+          type: array
+          items: { type: string, maxLength: 40 }
+        note:
+          type: string
+          maxLength: 2000
+
+    BookmarkCollectionResponse:
+      allOf:
+        - $ref: "#/components/schemas/GraphCollectionResponse"
+        - type: object
+          properties:
+            value:
+              type: array
+              items: { $ref: "#/components/schemas/Bookmark" }
+
+    # -------------------------
+    # Poster (first-class optional resource)
+    # -------------------------
+    Poster:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [eventId, projectId, posterPdfUrl]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubPoster"
+            eventId:
+              $ref: "#/components/schemas/GraphId"
+            projectId:
+              $ref: "#/components/schemas/GraphId"
+            posterPdfUrl:
+              $ref: "#/components/schemas/Url"
+              description: Canonical poster PDF.
+            derived:
+              type: object
+              additionalProperties: false
+              properties:
+                heroImageUrl:
+                  $ref: "#/components/schemas/Url"
+                thumbnailUrl:
+                  $ref: "#/components/schemas/Url"
+            embeddedVideoUrl:
+              $ref: "#/components/schemas/Url"
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    PosterUpsertRequest:
+      type: object
+      additionalProperties: false
+      required: [posterPdfUrl]
+      properties:
+        posterPdfUrl:
+          $ref: "#/components/schemas/Url"
+        derived:
+          type: object
+          additionalProperties: false
+          properties:
+            heroImageUrl: { $ref: "#/components/schemas/Url" }
+            thumbnailUrl: { $ref: "#/components/schemas/Url" }
+        embeddedVideoUrl:
+          $ref: "#/components/schemas/Url"
+
+    # -------------------------
+    # Import bundle (normalized)
+    # -------------------------
+    ValidationIssue:
+      type: object
+      additionalProperties: false
+      required: [path, message, severity]
+      properties:
+        path:
+          type: string
+          maxLength: 400
+        message:
+          type: string
+          maxLength: 2000
+        severity:
+          type: string
+          enum: [warning, error]
+
+    ImportBundleRequest:
+      type: object
+      additionalProperties: false
+      required: [bundleId, event, sessions, projects]
+      properties:
+        bundleId:
+          $ref: "#/components/schemas/GraphId"
+        source:
+          type: object
+          additionalProperties: false
+          required: [type, producedDateTime]
+          properties:
+            type:
+              type: string
+              enum: [excelExtract, csvExtract, manual]
+            producedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            notes:
+              type: string
+              maxLength: 2000
+        event:
+          $ref: "#/components/schemas/EventCreateRequest"
+        sessions:
+          type: array
+          items: { $ref: "#/components/schemas/SessionCreateRequest" }
+          default: []
+        projects:
+          type: array
+          items: { $ref: "#/components/schemas/ProjectCreateRequest" }
+          default: []
+        validation:
+          type: object
+          additionalProperties: false
+          properties:
+            strict:
+              type: boolean
+              default: true
+
+    ImportBundleResponse:
+      type: object
+      additionalProperties: false
+      required: [bundleId, accepted, issues]
+      properties:
+        bundleId:
+          $ref: "#/components/schemas/GraphId"
+        accepted:
+          type: boolean
+        issues:
+          type: array
+          items: { $ref: "#/components/schemas/ValidationIssue" }
+          default: []
+
+    # -------------------------
+    # AI: DOSA (Discovery; fail-closed)
+    # -------------------------
+    HighStakesDomain:
+      type: string
+      enum: [none, medical, legal, financial, safety]
+
+    RetrievalEngine:
+      type: string
+      enum: [azureAiSearch, other]
+
+    DOSASource:
+      type: object
+      additionalProperties: false
+      required: [sourceId, type, title, uri]
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/GraphId"
+        type:
+          type: string
+          enum: [file, url, searchChunk]
+        title:
+          type: string
+          maxLength: 400
+        uri:
+          $ref: "#/components/schemas/Url"
+        retrieval:
+          type: object
+          additionalProperties: false
+          required: [engine, query, topK]
+          properties:
+            engine:
+              $ref: "#/components/schemas/RetrievalEngine"
+            index:
+              type: string
+              maxLength: 200
+            query:
+              type: string
+              maxLength: 2000
+            topK:
+              type: integer
+              minimum: 1
+              maximum: 50
+
+    DOSAConstraints:
+      type: object
+      additionalProperties: false
+      properties:
+        highStakesDomain:
+          $ref: "#/components/schemas/HighStakesDomain"
+        maxClaims:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 15
+        requireCitationsPerClaim:
+          type: boolean
+          default: true
+        allowDirectQuotes:
+          type: boolean
+          default: true
+        maxQuoteWordsPerQuote:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 25
+
+    DOSARequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, userId, conversationId, mode, query, sources]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          minLength: 3
+          maxLength: 256
+        conversationId:
+          type: string
+          minLength: 3
+          maxLength: 256
+        mode:
+          type: string
+          const: discovery
+        query:
+          type: string
+          maxLength: 4000
+        sources:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items: { $ref: "#/components/schemas/DOSASource" }
+        constraints:
+          $ref: "#/components/schemas/DOSAConstraints"
+
+    DOSASupport:
+      type: object
+      additionalProperties: false
+      required: [sourceId]
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/GraphId"
+        span:
+          type: object
+          additionalProperties: false
+          required: [start, end]
+          properties:
+            start: { type: integer, minimum: 0 }
+            end: { type: integer, minimum: 0 }
+        locator:
+          type: string
+          maxLength: 200
+        quote:
+          type: string
+          maxLength: 500
+
+    DOSAClaimType:
+      type: string
+      enum: [statement, result, definition, recommendation]
+
+    DOSAExplicitClaim:
+      type: object
+      additionalProperties: false
+      required: [claimId, text, support, claimType, confidence]
+      properties:
+        claimId:
+          $ref: "#/components/schemas/GraphId"
+        text:
+          type: string
+          maxLength: 2000
+          description: Must be attributional (e.g., “The authors state…”).
+        support:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/DOSASupport" }
+        claimType:
+          $ref: "#/components/schemas/DOSAClaimType"
+        confidence:
+          type: string
+          const: explicit
+
+    DOSAEvidence:
+      type: object
+      additionalProperties: false
+      required: [evidenceId, description, asStatedBySource, sourceRefs]
+      properties:
+        evidenceId:
+          $ref: "#/components/schemas/GraphId"
+        description:
+          type: string
+          maxLength: 2000
+        asStatedBySource:
+          type: boolean
+          const: true
+        sourceRefs:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/DOSASupport" }
+        reportedStats:
+          type: object
+          additionalProperties: false
+          properties:
+            sampleSize: { type: integer, minimum: 0 }
+            population: { type: string, maxLength: 400 }
+            duration: { type: string, maxLength: 200 }
+
+    DOSARefTextItem:
+      type: object
+      additionalProperties: false
+      required: [id, text, sourceRefs]
+      properties:
+        id:
+          $ref: "#/components/schemas/GraphId"
+        text:
+          type: string
+          maxLength: 2000
+        sourceRefs:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/DOSASupport" }
+
+    DOSAUnresolvedQuestion:
+      type: object
+      additionalProperties: false
+      required: [questionId, text, basis, sourceRefs]
+      properties:
+        questionId:
+          $ref: "#/components/schemas/GraphId"
+        text:
+          type: string
+          maxLength: 2000
+        basis:
+          type: string
+          enum: [unstated, conflicting, outOfScope]
+        sourceRefs:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/DOSASupport" }
+
+    DOSANonCoverage:
+      type: object
+      additionalProperties: false
+      required: [topic, text, severity]
+      properties:
+        topic:
+          type: string
+          maxLength: 120
+        text:
+          type: string
+          maxLength: 2000
+        severity:
+          type: string
+          enum: [info, warning]
+
+    DOSASummary:
+      type: object
+      additionalProperties: false
+      required:
+        - explicitClaims
+        - evidencePresented
+        - statedAssumptions
+        - statedLimitations
+        - unresolvedQuestions
+        - nonCoverage
+      properties:
+        explicitClaims:
+          type: array
+          items: { $ref: "#/components/schemas/DOSAExplicitClaim" }
+          default: []
+        evidencePresented:
+          type: array
+          items: { $ref: "#/components/schemas/DOSAEvidence" }
+          default: []
+        statedAssumptions:
+          type: array
+          items: { $ref: "#/components/schemas/DOSARefTextItem" }
+          default: []
+        statedLimitations:
+          type: array
+          items: { $ref: "#/components/schemas/DOSARefTextItem" }
+          default: []
+        unresolvedQuestions:
+          type: array
+          items: { $ref: "#/components/schemas/DOSAUnresolvedQuestion" }
+          default: []
+        nonCoverage:
+          type: array
+          items: { $ref: "#/components/schemas/DOSANonCoverage" }
+          default: []
+
+    DOSACitationMeta:
+      type: object
+      additionalProperties: false
+      required: [sourceId, title, uri, retrievedDateTime]
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/GraphId"
+        title:
+          type: string
+          maxLength: 400
+        uri:
+          $ref: "#/components/schemas/Url"
+        retrievedDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        provenance:
+          type: object
+          additionalProperties: false
+          properties:
+            engine:
+              $ref: "#/components/schemas/RetrievalEngine"
+            chunkId:
+              type: string
+              maxLength: 200
+            score:
+              type: number
+
+    DOSASafety:
+      type: object
+      additionalProperties: false
+      required: [refusals, warnings, policyFlags]
+      properties:
+        refusals:
+          type: array
+          items: { type: string, maxLength: 2000 }
+          default: []
+        warnings:
+          type: array
+          items: { type: string, maxLength: 2000 }
+          default: []
+        policyFlags:
+          type: array
+          items: { type: string, maxLength: 200 }
+          default: []
+
+    DOSATrace:
+      type: object
+      additionalProperties: false
+      properties:
+        foundryThreadId:
+          type: string
+          maxLength: 200
+        foundryRunId:
+          type: string
+          maxLength: 200
+
+    DOSAResponse:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [mode, domain, summary, citations, safety]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubDosaResponse"
+            mode:
+              type: string
+              const: discovery
+            domain:
+              $ref: "#/components/schemas/HighStakesDomain"
+            summary:
+              $ref: "#/components/schemas/DOSASummary"
+            citations:
+              type: array
+              items: { $ref: "#/components/schemas/DOSACitationMeta" }
+            safety:
+              $ref: "#/components/schemas/DOSASafety"
+            trace:
+              $ref: "#/components/schemas/DOSATrace"
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    # -------------------------
+    # AI: PKA (Draft-only knowledge extraction)
+    # -------------------------
+    PKArtifactType:
+      type: string
+      enum: [paper, talk, repo]
+
+    PKAClaimType:
+      type: string
+      enum: [fact, result, interpretation]
+
+    PKACitation:
+      type: object
+      additionalProperties: false
+      required: [snapshotId, locator]
+      properties:
+        snapshotId:
+          type: string
+          maxLength: 200
+        locator:
+          type: string
+          maxLength: 200
+        span:
+          type: object
+          additionalProperties: false
+          properties:
+            start: { type: integer, minimum: 0 }
+            end: { type: integer, minimum: 0 }
+        quote:
+          type: string
+          maxLength: 500
+
+    PKARequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, artifactType, source]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        artifactType:
+          $ref: "#/components/schemas/PKArtifactType"
+        projectContext:
+          type: object
+          additionalProperties: false
+          properties:
+            projectId: { $ref: "#/components/schemas/GraphId" }
+            projectName: { type: string, maxLength: 240 }
+        source:
+          type: object
+          additionalProperties: false
+          required: [sourceUri, snapshotId, capturedDateTime, contentHash]
+          properties:
+            sourceUri:
+              $ref: "#/components/schemas/Url"
+            snapshotId:
+              type: string
+              maxLength: 200
+            capturedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            contentHash:
+              type: string
+              maxLength: 200
+            metadata:
+              type: object
+              additionalProperties: true
+        inputs:
+          type: object
+          additionalProperties: false
+          properties:
+            selectedFiles:
+              type: array
+              items: { type: string, maxLength: 400 }
+
+    PKABaselineClaim:
+      type: object
+      additionalProperties: false
+      required: [text, claimType, citations, confidence]
+      properties:
+        text:
+          type: string
+          maxLength: 2000
+        claimType:
+          $ref: "#/components/schemas/PKAClaimType"
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/PKACitation" }
+          default: []
+        confidence:
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+
+    PKABaseline:
+      type: object
+      additionalProperties: false
+      required: [title, plainLanguageOverview, primaryClaimsOrCapabilities]
+      properties:
+        title:
+          type: string
+          maxLength: 400
+        contributors:
+          type: array
+          items: { type: string, maxLength: 200 }
+          default: []
+        plainLanguageOverview:
+          type: string
+          maxLength: 5000
+        technicalProblemAddressed:
+          type: string
+          maxLength: 5000
+        keyMethodsOrApproach:
+          type: array
+          items: { type: string, maxLength: 400 }
+          default: []
+        primaryClaimsOrCapabilities:
+          type: array
+          items: { $ref: "#/components/schemas/PKABaselineClaim" }
+          default: []
+        limitationsOrConstraints:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [text, citations, severity]
+            properties:
+              text: { type: string, maxLength: 2000 }
+              citations:
+                type: array
+                items: { $ref: "#/components/schemas/PKACitation" }
+                default: []
+              severity:
+                type: string
+                enum: [low, medium, high]
+        openQuestionsOrFutureWork:
+          type: array
+          items: { type: string, maxLength: 400 }
+          default: []
+
+    PKAQuality:
+      type: object
+      additionalProperties: false
+      required: [confidence]
+      properties:
+        confidence:
+          type: object
+          additionalProperties: false
+          required: [value, scale, meaning, justification]
+          properties:
+            value: { type: number, minimum: 0.0, maximum: 1.0 }
+            scale: { type: string, const: "0-1" }
+            meaning: { type: string, const: "editorial_confidence" }
+            justification: { type: string, maxLength: 2000 }
+        knownGaps:
+          type: array
+          items: { type: string, maxLength: 400 }
+          default: []
+        riskFlags:
+          type: array
+          items: { type: string, maxLength: 200 }
+          default: []
+
+    PKAProvenance:
+      type: object
+      additionalProperties: false
+      required: [agentName, agentVersion, promptVersion, runDateTime]
+      properties:
+        agentName:
+          type: string
+          const: "Project Knowledge Agent"
+        agentVersion:
+          type: string
+          maxLength: 40
+        promptVersion:
+          type: string
+          maxLength: 80
+        runDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+
+    PKAKnowledgeArtifact:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required: [schemaVersion, artifactType, source, provenance, baseline, quality, draftState]
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubPkaKnowledgeArtifact"
+            schemaVersion:
+              type: string
+              const: "pka-1.0"
+            artifactType:
+              $ref: "#/components/schemas/PKArtifactType"
+            source:
+              type: object
+              additionalProperties: false
+              required: [sourceUri, snapshotId, capturedDateTime, contentHash]
+              properties:
+                sourceUri: { $ref: "#/components/schemas/Url" }
+                snapshotId: { type: string, maxLength: 200 }
+                capturedDateTime: { $ref: "#/components/schemas/GraphDateTime" }
+                contentHash: { type: string, maxLength: 200 }
+                metadata:
+                  type: object
+                  additionalProperties: true
+            provenance:
+              $ref: "#/components/schemas/PKAProvenance"
+            baseline:
+              $ref: "#/components/schemas/PKABaseline"
+            datatypeSpecific:
+              type: object
+              additionalProperties: true
+            additionalFoundKnowledge:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required: [type, text, basis, citations, confidence]
+                properties:
+                  type:
+                    type: string
+                    enum: [sideFinding, crossOver, emergentImplication, undocumentedWorkflow, communitySignal]
+                  text: { type: string, maxLength: 2000 }
+                  basis: { type: string, enum: [explicit, inference] }
+                  citations:
+                    type: array
+                    items: { $ref: "#/components/schemas/PKACitation" }
+                    default: []
+                  confidence: { type: number, minimum: 0.0, maximum: 1.0 }
+              default: []
+            quality:
+              $ref: "#/components/schemas/PKAQuality"
+            draftState:
+              type: string
+              enum: [draft, reviewed, approvedForPublishing]
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    PKAResponse:
+      type: object
+      additionalProperties: false
+      required: [knowledgeArtifact, humanReadableAnalysis]
+      properties:
+        knowledgeArtifact:
+          $ref: "#/components/schemas/PKAKnowledgeArtifact"
+        humanReadableAnalysis:
+          type: string
+          maxLength: 200000
+
+    # -------------------------
+    # Published project knowledge (human-approved; attendee-safe)
+    # -------------------------
+    KnowledgeSourceRef:
+      type: object
+      additionalProperties: false
+      required: [snapshotId, sourceUri]
+      properties:
+        snapshotId:
+          type: string
+          maxLength: 200
+        sourceUri:
+          $ref: "#/components/schemas/Url"
+        capturedDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        contentHash:
+          type: string
+          maxLength: 200
+        notes:
+          type: string
+          maxLength: 1000
+
+    PublishedKnowledgeSection:
+      type: object
+      additionalProperties: false
+      required: [text, citations]
+      properties:
+        text:
+          type: string
+          maxLength: 8000
+        citations:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/PKACitation"
+
+    PublishedProjectKnowledge:
+      allOf:
+        - $ref: "#/components/schemas/GraphEntity"
+        - type: object
+          additionalProperties: false
+          required:
+            - eventId
+            - projectId
+            - schemaVersion
+            - approvedBy
+            - approvedDateTime
+            - sources
+            - heilmeier
+            - faq
+          properties:
+            "@odata.type":
+              const: "#microsoft.graph.eventHubPublishedProjectKnowledge"
+            eventId:
+              $ref: "#/components/schemas/GraphId"
+            projectId:
+              $ref: "#/components/schemas/GraphId"
+            schemaVersion:
+              type: string
+              const: "published-1.0"
+            approvedBy:
+              type: string
+              minLength: 3
+              maxLength: 256
+            approvedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            sourceDraftArtifactIds:
+              type: array
+              items: { $ref: "#/components/schemas/GraphId" }
+              default: []
+            sources:
+              type: array
+              minItems: 1
+              items: { $ref: "#/components/schemas/KnowledgeSourceRef" }
+            heilmeier:
+              type: object
+              additionalProperties: false
+              required:
+                - whatAreYouTryingToDo
+                - howIsItDoneToday
+                - whatIsNew
+                - whoCares
+                - risksAndPayoffs
+                - metricsOfSuccess
+              properties:
+                whatAreYouTryingToDo:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+                howIsItDoneToday:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+                whatIsNew:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+                whoCares:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+                risksAndPayoffs:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+                metricsOfSuccess:
+                  $ref: "#/components/schemas/PublishedKnowledgeSection"
+            faq:
+              type: array
+              default: []
+              items:
+                type: object
+                additionalProperties: false
+                required: [question, answer]
+                properties:
+                  question:
+                    type: string
+                    maxLength: 300
+                  answer:
+                    $ref: "#/components/schemas/PublishedKnowledgeSection"
+            scopeNotes:
+              type: string
+              maxLength: 4000
+            createdDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+            lastModifiedDateTime:
+              $ref: "#/components/schemas/GraphDateTime"
+
+    PublishedProjectKnowledgeUpsertRequest:
+      type: object
+      additionalProperties: false
+      required: [approvedBy, approvedDateTime, sources, heilmeier, faq]
+      properties:
+        approvedBy:
+          type: string
+          minLength: 3
+          maxLength: 256
+        approvedDateTime:
+          $ref: "#/components/schemas/GraphDateTime"
+        sourceDraftArtifactIds:
+          type: array
+          items: { $ref: "#/components/schemas/GraphId" }
+          default: []
+        sources:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/KnowledgeSourceRef" }
+        heilmeier:
+          $ref: "#/components/schemas/PublishedProjectKnowledge/properties/heilmeier"
+        faq:
+          $ref: "#/components/schemas/PublishedProjectKnowledge/properties/faq"
+        scopeNotes:
+          type: string
+          maxLength: 4000

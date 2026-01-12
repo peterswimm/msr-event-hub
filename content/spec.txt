@@ -1,0 +1,148 @@
+Project Knowledge Agent – Knowledge Extraction POC (v1)
+
+Executive Summary – Longer‑Term Vision (Context Only)
+The long‑term vision is to create a Project Agent that automatically builds and maintains rich, trustworthy project knowledge hubs by continuously ingesting papers, talks, and code repositories. These hubs would serve both human audiences (project pages, storytelling, discovery) and AI systems (Copilot, search, research assistants).
+This POC does not attempt to build the full Project Agent. Instead, it focuses narrowly on validating the foundational building blocks required to make that vision viable: high‑quality, structured knowledge extraction agents for individual research artifacts.
+A stretch outcome of this POC is to demonstrate that multiple artifact‑level knowledge outputs can be compiled into a single, coherent project‑level knowledge base.
+________________________________________
+1. POC Objective (Primary Focus)
+The goal of this Proof of Concept is to:
+•	Build v1 knowledge extraction agents for three research artifact types:
+o	Research papers
+o	Research talk / speech transcripts
+o	Code / model repositories
+•	Use low‑code methods only (LLMs + prompt engineering)
+•	Produce structured knowledge artifacts (JSON) for each input
+•	Enable human review and assessment of quality, accuracy, and usefulness
+The POC explicitly focuses on extraction and structuring, not publishing, automation, or scale.
+________________________________________
+2. Problem Statement (POC Framing)
+•	High‑value research knowledge is locked inside unstructured artifacts.
+•	LLMs reason unreliably over raw papers, talks, and repos.
+•	There is no consistent, reusable “knowledge layer” between raw research and downstream applications.
+POC Hypothesis: If we can reliably extract structured, high‑fidelity knowledge from individual research artifacts, then both human understanding and AI reasoning quality will improve measurably.
+________________________________________
+3. POC Scope
+In Scope
+•	Manual selection of sample inputs (3–4 projects)
+•	Artifact‑level knowledge extraction
+•	Prompt‑based LLM agents
+•	Structured JSON schema design
+•	Human expert review
+•	Iterative prompt tuning
+Out of Scope
+•	Model fine‑tuning or training
+•	Automated publishing to project pages
+•	Full knowledge graph implementation
+•	Continuous ingestion pipelines
+•	MSR‑wide deployment
+________________________________________
+4. Core POC Deliverables
+Each agent produces two outputs:
+1.	Structured Knowledge Artifact (JSON)
+2.	Human‑readable Summary / Analysis
+These outputs are used exclusively for review, comparison, and evaluation during the POC.
+________________________________________
+5. Knowledge Extraction Agents (POC v1)
+5.1 Paper Knowledge Agent
+Purpose: Extract a deep, structured understanding of a research paper beyond the abstract.
+Inputs: PDF, bibliographic metadata
+Outputs: - Structured knowledge JSON - Long‑form analytical summary
+________________________________________
+5.2 Talk / Speech Transcript Agent
+Purpose: Extract key concepts, themes, and technical details from spoken research presentations.
+Inputs: Transcript, optional video metadata
+Outputs: - Structured knowledge JSON - Sectioned narrative outline
+________________________________________
+5.3 Code / Model Repository Agent
+Purpose: Extract functional and technical understanding of a research‑linked repo.
+Inputs: Repo URL, README, selected files
+Outputs: - Structured knowledge JSON - Usage / architecture summary
+________________________________________
+6. Core Knowledge Schema (POC Baseline)
+All three agents share a common baseline schema to support comparison and future compilation:
+•	Title
+•	Contributors / authors
+•	Plain‑language overview
+•	Technical problem addressed
+•	Key methods / approach
+•	Primary claims / capabilities
+•	Novelty vs. prior work
+•	Limitations / known constraints
+•	Potential impact
+•	Open questions / future work
+•	Key evidence / citations
+•	Confidence score
+•	Provenance (agent + source type)
+Each agent then appends a datatype‑specific core schema plus a flexible Additional / Found Knowledge section for unanticipated insights.
+________________________________________
+6.1 Paper – Datatype‑Specific Core Knowledge Schema
+Publication & Context - Venue (conference, journal, workshop, preprint) - Year of publication - Peer‑reviewed status - Related prior work cited as most influential
+Data & Evaluation - Datasets used (name, size, public/proprietary) - Benchmarks referenced - Evaluation metrics - Baseline comparisons
+Results & Evidence - Key quantitative results - Figures and tables referenced - Statistical significance (if reported) - Reproducibility notes (code/data availability)
+Research Maturity - Stage (exploratory, validated, deployed) - Known limitations acknowledged by authors - Ethical / societal considerations (if discussed)
+Additional / Found Knowledge (Paper) - Unanticipated methods, side findings, domain cross‑overs, or emergent implications not explicitly structured above
+________________________________________
+6.2 Talk / Speech Transcript – Datatype‑Specific Core Knowledge Schema
+Presentation Structure - Talk type (research update, keynote, demo, tutorial) - Duration - Section / topic breakdown - Time‑coded key segments
+Demonstration & Evidence - Demo included (Y/N) - Demo description - Live vs. recorded demonstration - Experimental results discussed verbally
+Challenges & Forward‑Looking Content - Technical challenges discussed - Open risks mentioned by speakers - Pending experiments or next milestones - Collaboration requests or calls to action
+Audience & Framing - Intended audience (technical, general, mixed) - Level of technical depth - Assumed background knowledge
+Additional / Found Knowledge (Talk) - Off‑script insights, implicit assumptions, audience Q&A signals, or strategic hints not captured in the formal outline
+________________________________________
+6.3 Code / Model Repository – Datatype‑Specific Core Knowledge Schema
+Artifact Classification - Artifact type (SDK, service, model, dataset, framework, tool) - Primary purpose of the artifact - Intended users
+Technical Stack - Primary programming language(s) - Key libraries / frameworks - Supported platforms / environments - Hardware dependencies (if any)
+Operational Details - Installation prerequisites - Setup complexity (low / medium / high) - Training vs. inference environments (if applicable) - Runtime dependencies
+Usage & Maturity - Example use cases - API surface summary - Model or system limitations - Maintenance status (active, experimental, archived)
+Governance & Access - License - Data usage constraints - External dependencies with restrictive licenses
+Additional / Found Knowledge (Repo) - Implicit design decisions, undocumented workflows, performance caveats, or community practices inferred from issues, commits, or examples
+________________________________________
+________________________________________
+7. POC Workflow
+1.	Select 3–4 RRS projects with overlapping artifacts
+2.	Collect papers, transcripts, and repos
+3.	Define v1 schema for each artifact type
+4.	Run v1 prompts to generate structured outputs
+5.	Conduct expert review of each output
+6.	Iterate prompts and schema
+7.	Generate final v1 knowledge artifacts
+________________________________________
+8. Stretch Goal – Project‑Level Knowledge Compilation
+As a stretch outcome, the POC will explore:
+•	Collating paper, talk, and repo knowledge JSON into a single project‑level knowledge base
+•	Resolving conflicts and overlaps between artifacts
+•	Producing:
+o	A synthesized project overview
+o	A project‑level knowledge FAQ
+This stretch is successful if it demonstrates technical feasibility, not production readiness.
+________________________________________
+9. Validation & Review
+Evaluation in the POC is based on human expert assessment and comparative analysis across artifact types.
+Review dimensions: - Factual accuracy - Completeness - Faithfulness to source - Signal‑to‑noise ratio - Reusability for downstream AI systems
+________________________________________
+10. Governance, Trust & Constraints
+•	All content is AI‑generated drafts only
+•	No outputs are published without explicit human approval
+•	All claims must reference original sources
+•	Only opt‑in projects are included
+________________________________________
+Appendix A – Longer‑Term Project Agent Vision
+The longer‑term Project Agent would:
+•	Automatically ingest new papers, talks, and repos
+•	Maintain a persistent project knowledge base
+•	Continuously update project pages
+•	Power Copilot, search, and discovery tools
+This capability is explicitly out of scope for the current POC and is included here for strategic alignment only.
+________________________________________
+Appendix B – Success Metrics (For POC and Beyond)
+POC Success Indicators
+•	Expert accuracy rating ≥4/5
+•	High inter‑reviewer agreement
+•	Clear improvement over baseline abstracts
+•	Successful production of structured JSON across all three artifact types
+Future‑State Success Metrics (Post‑POC)
+•	Reduction in manual project page creation effort
+•	Improvement in Copilot answer accuracy
+•	Increased reuse of research across teams
+•	Reduction in stale project content

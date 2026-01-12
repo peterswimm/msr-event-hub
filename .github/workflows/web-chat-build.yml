@@ -1,0 +1,39 @@
+name: web-chat-build
+
+on:
+  push:
+    paths:
+      - 'web/chat/**'
+      - '.github/workflows/web-chat-build.yml'
+  pull_request:
+    paths:
+      - 'web/chat/**'
+      - '.github/workflows/web-chat-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: web/chat/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: web/chat
+
+      - name: Build web chat
+        run: npm run build
+        working-directory: web/chat
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-chat-dist
+          path: web/chat/dist

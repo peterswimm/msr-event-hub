@@ -1,0 +1,478 @@
+:root {
+  color-scheme: light;
+  --bg: #f2f2f2;
+  --panel: #ffffff;
+  --header-bg: #f0f0f0;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.08);
+  --border-radius: 8px;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg: #0f0f0f;
+  --panel: #0f0f0f;
+  --header-bg: #252525;
+  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+}
+
+[data-tabster-dummy] {
+  display: none !important;
+}
+.chat-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.chat-header,
+.chat-footer {
+  background: var(--panel);
+  padding: 0;
+  box-shadow: none;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.suggestion-buttons .fui-Button {
+  padding: 16px 18px;
+  min-width: 260px;
+  justify-content: flex-start;
+}
+
+.chat-main {
+  background: var(--bg);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 400px) {
+  .chat-main {
+    padding: 0;
+  }
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 4px;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.message-card {
+  background: var(--panel);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  color: #ffffff;
+}
+
+.message-card.user {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.message-card.assistant {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.answer-markdown {
+  line-height: 1.5;
+  color: #ffffff;
+}
+.answer-markdown .md-list {
+  padding-left: 20px;
+}
+.answer-markdown .md-code {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: #ffffff;
+}
+.answer-markdown .md-pre {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 10px;
+  overflow-x: auto;
+  color: #ffffff;
+}
+
+.message-input-container {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.message-input-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 10px;
+}
+
+.message-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: var(--panel);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.message-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.message-actions .fui-Button {
+  min-width: 44px;
+  height: 40px;
+}
+
+.message-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  gap: 10px;
+}
+
+/* Additional status cards and utilities to style notifications */
+.status-card {
+  background: var(--panel);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  max-width: 1080px;
+  width: 100%;
+  margin: 10px auto;
+}
+
+.status-card .status-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.status-card.warning {
+  border-left: 4px solid #ffaa44;
+}
+
+.status-card.error {
+  border-left: 4px solid #f1707b;
+}
+
+.streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 1080px;
+  width: 100%;
+  margin: 8px auto;
+}
+
+/* Field layout inside input */
+.message-field {
+  width: 100%;
+}
+/* Input row layout on wider screens */
+.message-input {
+  align-items: stretch;
+}
+
+.streaming-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f4ff;
+  border: 1px solid #d6e2ff;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.suggestion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.status-card {
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #e3e3e3;
+  background: #fdfdfd;
+  display: grid;
+  gap: 6px;
+}
+
+.status-card.warning {
+  border-color: #f0b429;
+  background: #fff7e6;
+}
+
+/* Branded header styles */
+.brand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--header-bg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.brand-left a {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.brand-left a:hover {
+  text-decoration: underline;
+}
+
+.microsoft-text {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.microsoft-logo {
+  display: grid;
+  grid-template-columns: repeat(2, 11px);
+  grid-template-rows: repeat(2, 11px);
+  gap: 2px;
+}
+
+.logo-square {
+  width: 11px;
+  height: 11px;
+}
+
+.logo-red {
+  background: #f25022;
+}
+
+.logo-green {
+  background: #7fba00;
+}
+
+.logo-blue {
+  background: #00a4ef;
+}
+
+.logo-yellow {
+  background: #ffb900;
+}
+
+.brand-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-microsoft {
+  font-weight: 600;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.brand-divider {
+  opacity: 0.5;
+  padding: 0 4px;
+}
+
+/* Hero section styles */
+.hero {
+  max-width: 1080px;
+  width: 100%;
+  margin: 60px auto 40px;
+  padding: 20px;
+}
+
+.hero-content {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.hero-content .title-large {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.hero-content .subtitle {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.9;
+  color: #ffffff;
+}
+
+.prompt-instruction {
+  text-align: center;
+  font-size: 15px;
+  opacity: 0.85;
+  margin: 24px 0;
+  color: #ffffff;
+}
+
+.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.hero-card {
+  background: var(--panel);
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+}
+
+.hero-card:hover {
+  transform: translateY(-2px);
+  border-color: #4d4d4d;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.hero-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.hero-card-subtitle {
+  opacity: 0.7;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.input-disclaimer {
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: left;
+  flex: 1;
+}
+
+.status-card.error {
+  border-color: #d13438;
+  background: #fff1f0;
+}
+
+.status-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .chat-shell {
+    padding: 12px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .message-input {
+    flex-direction: column;
+  }
+
+  .message-input button {
+    width: 100%;
+  }
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: var(--header-bg);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+}
+
+.footer-text {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.footer-container a {
+  color: #0078d4;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.footer-container a:hover {
+  text-decoration: underline;
+}
