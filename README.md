@@ -2,8 +2,9 @@
 
 **A scalable platform for MSR internal events and lecture series**
 
-**Status**: Production-Ready Platform (Phase E Complete)  
-**Branch**: `poc1219`
+**Status**: Production-Ready Platform (Phase E Complete + Modern Frontend)  
+**Branch**: `main`
+**Frontend**: React 18.2 + Vite 7.3 + Fluent UI v9 (Modern UI)
 
 ---
 
@@ -15,8 +16,9 @@ The **MSR Event Hub** is a digital platform that augments MSR events with experi
 - **Event Management**: Multi-event homepage, event-specific sites with agendas, sessions, and posters
 - **Poster/Project Hub**: Structured project pages with bookmarking, QR codes, and rich asset links
 - **Knowledge Extraction**: AI-powered ingestion from papers, talks, and code repositories
-- **Discovery & Chat**: Cross-event exploration with AI-assisted search and recommendations
+- **Discovery & Chat**: Cross-event exploration with AI-assisted search and recommendations (Modern React UI)
 - **Admin Tools**: Self-service content management for organizers and presenters
+- **Modern Frontend**: React 18 + Vite + Fluent UI v9 with dark theme, fully env-configurable
 
 ### Core Audiences
 - **Organizers**: Reduce friction for setup, planning, content validation, and reporting
@@ -29,9 +31,21 @@ The **MSR Event Hub** is a digital platform that augments MSR events with experi
 
 ```
 msr-event-hub/
+├── web/chat/                # Modern React frontend (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/      # React components (BrandHeader, HeroCards, MessageInput, etc.)
+│   │   ├── clients/         # API clients (azureOpenAI, hubChat)
+│   │   ├── types/           # TypeScript types (messages)
+│   │   ├── App.tsx          # Main app component
+│   │   ├── main.tsx         # Entry point with theme provider
+│   │   └── styles.css       # Global styles (dark theme)
+│   ├── .env.example         # Environment configuration template
+│   └── package.json         # Frontend dependencies
+│
 ├── api/                     # REST API endpoints
 │   ├── v1_events.py         # Event management
 │   ├── v1_projects.py       # Project/poster endpoints
+│   ├── chat_routes.py       # Chat/streaming endpoints
 │   └── v1_workflows.py      # Workflow orchestration
 │
 ├── agents/                  # Knowledge extraction agents
@@ -70,7 +84,7 @@ msr-event-hub/
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Install Backend Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -83,24 +97,53 @@ cp .env.example .env
 # Edit .env with your Azure OpenAI and database credentials
 ```
 
-### 3. Initialize Infrastructure
+### 3. Initialize Frontend
 
 ```bash
-# Setup Phase E components (database, Redis, Neo4j)
-./setup_phase_e.sh
-
-# Or use Docker Compose
-docker-compose up -d
+cd web/chat
+npm install
+cp .env.example .env
+# Edit .env with VITE_* variables (see below)
 ```
 
 ### 4. Run the Platform
 
 ```bash
-# Start the API server
-python run_server.py --reload
+# From project root: starts both backend API and frontend
+.\start.ps1   # Windows PowerShell
+# or
+./start.sh    # Linux/macOS
+
+# Access the UI at http://localhost:5173
+# API Documentation at http://localhost:8000/docs
 ```
 
-**API Documentation**: <http://localhost:8000/docs>
+### 5. Frontend Environment Configuration
+
+The frontend uses environment variables for complete customization:
+
+```env
+# API Configuration
+VITE_CHAT_API_BASE=/api                           # Hub proxy endpoint
+VITE_AOAI_ENDPOINT=https://xxx.openai.azure.com   # Direct Azure OpenAI (optional)
+VITE_AOAI_DEPLOYMENT=gpt-4                        # Deployment name
+VITE_AOAI_API_VERSION=2024-02-15-preview          # API version
+VITE_AOAI_KEY=your-key                            # API key (dev only!)
+
+# Content Configuration
+VITE_SITE_TITLE="MSR Red: Redmond Research Showcase copilot"
+VITE_FRONTPAGE_HEADING="Meet MSR Red: Your Guide for the Redmond Research Showcase"
+VITE_FRONTPAGE_SUBHEADING="To plan your visit based on your research interests..."
+VITE_PROMPT_INSTRUCTION="Get started with an example prompt below or enter your own."
+VITE_AI_DISCLAIMER="AI may generate incorrect answers, please check citations for accuracy."
+
+# Hero Cards Configuration (JSON array)
+VITE_HERO_CARDS='[{"title":"Help me find projects...","subtitle":"Ask a few questions...","prompt":"..."}]'
+
+# Theme & Links
+VITE_THEME=webDark
+VITE_FEEDBACK_URL="mailto:feedback@microsoft.com"
+```
 
 ---
 
