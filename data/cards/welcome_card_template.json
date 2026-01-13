@@ -1,0 +1,62 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "fallbackText": "Welcome to MSR Event Hub Chat! I can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Welcome to MSR Event Hub Chat!",
+      "size": "large",
+      "weight": "bolder",
+      "color": "accent",
+      "spacing": "none"
+    },
+    {
+      "type": "TextBlock",
+      "text": "I can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
+      "wrap": true,
+      "spacing": "small"
+    },
+    {
+      "type": "TextBlock",
+      "text": "What would you like to do?",
+      "weight": "bolder",
+      "spacing": "medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Browse All Projects",
+      "data": {
+        "action": "browse_all",
+        "intent": "project_search"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Filter by Category",
+      "data": {
+        "action": "category_select",
+        "intent": "category_browse"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Find by Researcher",
+      "data": {
+        "action": "researcher_search",
+        "intent": "people_lookup"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Recording Status",
+      "data": {
+        "action": "recording_filter",
+        "intent": "recording_status"
+      }
+    }
+  ]
+}

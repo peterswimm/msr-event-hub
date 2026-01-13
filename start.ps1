@@ -35,6 +35,23 @@ if (-not ($pythonPackages -match "fastapi")) {
 }
 Write-Host ""
 
+# Check if CSV auto-import is enabled
+if ($env:AUTO_IMPORT_CSV -eq "true") {
+    Write-Host "🔄 CSV auto-import enabled..." -ForegroundColor Cyan
+    if (Test-Path "scripts\import_rrs_csv.py") {
+        Write-Host "Importing RRS data from CSV..." -ForegroundColor Yellow
+        & .\.venv\Scripts\python.exe scripts\import_rrs_csv.py
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✓ CSV import completed successfully" -ForegroundColor Green
+        } else {
+            Write-Host "⚠️  CSV import failed (continuing anyway)" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "⚠️  Import script not found: scripts\import_rrs_csv.py" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
+
 # Check if frontend needs building
 $frontendDist = Join-Path $PSScriptRoot "web\chat\dist"
 $frontendPackageJson = Join-Path $PSScriptRoot "web\chat\package.json"

@@ -25,7 +25,46 @@ function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [examplePrompts, setExamplePrompts] = useState<Array<{title: string; prompt: string}>>([]);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Load welcome message and examples on mount
+  React.useEffect(() => {
+    const loadWelcome = async () => {
+      try {
+        // Determine the correct backend URL
+        // In dev: backend is at localhost:8000
+        // In production: backend is at same origin or configured via env
+        const baseUrl = (import.meta.env.VITE_CHAT_API_BASE as string | undefined) ?? 
+                       (import.meta.env.DEV ? "http://localhost:8000/api" : "/api");
+        console.log("Loading welcome from:", `${baseUrl}/chat/welcome`);
+        const response = await fetch(`${baseUrl}/chat/welcome`);
+        console.log("Welcome response status:", response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Welcome data received:", data);
+          setMessages([{
+            id: "welcome",
+            role: "assistant",
+            content: `${data.message}\n\n${data.description}`,
+            adaptive_card: data.adaptive_card // Include the adaptive card
+          }]);
+          console.log("Messages set with welcome card:", data.adaptive_card ? "has card" : "no card");
+          setExamplePrompts(data.examples || []);
+        }
+      } catch (err) {
+        console.error("Failed to load welcome message:", err);
+        // Use default messages if API fails
+        setMessages([{
+          id: "welcome",
+          role: "assistant",
+          content: "Welcome to MSR Event Hub Chat! 🎓\n\nI can help you explore research projects, find sessions, and learn about the Redmond Research Showcase."
+        }]);
+      }
+    };
+    
+    loadWelcome();
+  }, []);
 
   const config = useMemo(
     () => ({
@@ -33,7 +72,8 @@ function App() {
       deployment: import.meta.env.VITE_AOAI_DEPLOYMENT as string | undefined,
       apiVersion: (import.meta.env.VITE_AOAI_API_VERSION as string | undefined) ?? "2024-02-15-preview",
       apiKey: import.meta.env.VITE_AOAI_KEY as string | undefined,
-      hubApiBase: (import.meta.env.VITE_CHAT_API_BASE as string | undefined) ?? "/api",
+      hubApiBase: (import.meta.env.VITE_CHAT_API_BASE as string | undefined) ?? 
+                  (import.meta.env.DEV ? "http://localhost:8000/api" : "/api"),
       siteTitle: (import.meta.env.VITE_SITE_TITLE as string | undefined) ?? "MSR Red: Redmond Research Showcase copilot",
       frontHeading: (import.meta.env.VITE_FRONTPAGE_HEADING as string | undefined) ?? "Questions about Microsoft Research?",
       frontSubheading:
@@ -94,6 +134,7 @@ function App() {
 
       const assistantId = crypto.randomUUID();
       let assistantContent = "";
+      let assistantCard: any = null;
 
       try {
         const stream = prefersHubProxy
@@ -111,8 +152,25 @@ function App() {
               signal: controller.signal
             });
 
-        for await (const delta of stream) {
-          assistantContent += delta;
+        for await (const chunk of stream) {
+          // Handle both string deltas (from Azure) and payload objects (from hub)
+          const delta = typeof chunk === "string" ? chunk : chunk?.delta || "";
+          const adaptiveCard = typeof chunk === "object" ? chunk?.adaptive_card : null;
+          // Debug: log incoming chunk structure
+          if (typeof chunk === "object") {
+            console.log("[stream] payload keys:", Object.keys(chunk));
+            console.log("[stream] has adaptive_card:", Boolean(chunk?.adaptive_card));
+          } else {
+            console.log("[stream] delta chunk length:", delta.length);
+          }
+          
+          if (delta) {
+            assistantContent += delta;
+          }
+          if (adaptiveCard && !assistantCard) {
+            assistantCard = adaptiveCard;
+          }
+          
           setMessages((prev: ChatMessage[]) => {
             const next = prev.filter((m: ChatMessage) => m.id !== assistantId);
             return [
@@ -120,7 +178,8 @@ function App() {
               {
                 id: assistantId,
                 role: "assistant",
-                content: assistantContent
+                content: assistantContent,
+                adaptive_card: assistantCard
               }
             ];
           });
@@ -144,6 +203,89 @@ function App() {
     setMessages([]);
     setError(null);
   }, []);
+
+  const handleCardAction = useCallback(async (actionData: any) => {
+    // Handle different card actions
+    // Send card action as JSON query to backend
+    if (actionData.action) {
+      const cardActionQuery = JSON.stringify({
+        action: actionData.action,
+        projectId: actionData.projectId,
+        researchArea: actionData.researchArea
+      });
+      
+      // Build messages with card action as a user message so backend detects it
+      const baseMessages: ChatMessage[] = [
+        { id: "system", role: "system", content: systemPrompt },
+        ...messages,
+        { id: "action", role: "user", content: cardActionQuery } // Changed from system to user
+      ];
+      
+      setError(null);
+      setIsStreaming(true);
+      
+      const controller = new AbortController();
+      abortRef.current = controller;
+      
+      const assistantId = crypto.randomUUID();
+      let assistantContent = "";
+      let assistantCard: any = null;
+      
+      try {
+        const stream = prefersHubProxy
+          ? streamHubChat({
+              baseUrl: config.hubApiBase!,
+              messages: baseMessages,
+              signal: controller.signal
+            })
+          : streamChatCompletion({
+              endpoint: config.endpoint!,
+              deployment: config.deployment!,
+              apiVersion: config.apiVersion!,
+              apiKey: config.apiKey!,
+              messages: baseMessages,
+              signal: controller.signal
+            });
+
+        for await (const chunk of stream) {
+          const delta = typeof chunk === "string" ? chunk : chunk?.delta || "";
+          const adaptiveCard = typeof chunk === "object" ? chunk?.adaptive_card : null;
+          
+          if (delta) {
+            assistantContent += delta;
+          }
+          if (adaptiveCard && !assistantCard) {
+            assistantCard = adaptiveCard;
+          }
+          
+          setMessages((prev: ChatMessage[]) => {
+            const next = prev.filter((m: ChatMessage) => m.id !== assistantId);
+            return [
+              ...next,
+              {
+                id: assistantId,
+                role: "assistant",
+                content: assistantContent,
+                adaptive_card: assistantCard
+              }
+            ];
+          });
+        }
+      } catch (err) {
+        const fallback = err instanceof Error ? err.message : "Unexpected error";
+        setError(fallback);
+      } finally {
+        setIsStreaming(false);
+        abortRef.current = null;
+      }
+    } else if (actionData.query) {
+      // If the card action has a query, send it
+      handleSend(actionData.query);
+    } else {
+      // Default: just send the card data as a message
+      handleSend(JSON.stringify(actionData));
+    }
+  }, [handleSend, config.hubApiBase, config.endpoint, config.deployment, config.apiVersion, config.apiKey, messages, prefersHubProxy, canStreamDirect, systemPrompt]);
 
   return (
     <ChatLayout
@@ -174,11 +316,21 @@ function App() {
       ) : null}
 
       {messages.length === 0 ? (
+        <div className="loading-message">
+          <p>Loading chat interface...</p>
+        </div>
+      ) : null}
+
+      {messages.length === 0 ? (
         <HeroCards
           heading={config.frontHeading!}
           subheading={config.frontSubheading!}
           promptInstruction={config.promptInstruction}
-          cards={(import.meta.env.VITE_HERO_CARDS ? JSON.parse(import.meta.env.VITE_HERO_CARDS as string) : undefined) || [
+          cards={(import.meta.env.VITE_HERO_CARDS ? JSON.parse(import.meta.env.VITE_HERO_CARDS as string) : undefined) || examplePrompts.map((ex: any) => ({
+            title: ex.title,
+            subtitle: `Ask: "${ex.prompt}"`,
+            prompt: ex.prompt
+          })) || [
             { title: "Help me find projects that match my interests.", subtitle: "Ask a few questions to get to know me.", prompt: "Help me find projects that match my interests." },
             { title: "Activate Agenda Mode to plan my visit.", subtitle: "Ask a few questions about my interests.", prompt: "Activate Agenda Mode to plan my visit." },
             { title: "Evaluate collaboration opportunities.", subtitle: "Focus on AI and renewable energy.", prompt: "Evaluate the collaboration opportunities between projects focused on artificial intelligence and renewable energy at the showcase." },
@@ -188,7 +340,7 @@ function App() {
         />
       ) : null}
 
-      <MessageList messages={messages} />
+      <MessageList messages={messages} onCardAction={handleCardAction} />
 
       {isStreaming ? (
         <div className="streaming-indicator">

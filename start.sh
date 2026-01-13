@@ -28,6 +28,24 @@ if ! .venv/bin/pip list 2>/dev/null | grep -q "fastapi"; then
     echo "✓ Python dependencies installed"
 fi
 echo ""
+
+# Check if CSV auto-import is enabled
+if [ "$AUTO_IMPORT_CSV" = "true" ]; then
+    echo "🔄 CSV auto-import enabled..."
+    if [ -f "scripts/import_rrs_csv.py" ]; then
+        echo "Importing RRS data from CSV..."
+        .venv/bin/python scripts/import_rrs_csv.py
+        if [ $? -eq 0 ]; then
+            echo "✓ CSV import completed successfully"
+        else
+            echo "⚠️  CSV import failed (continuing anyway)"
+        fi
+    else
+        echo "⚠️  Import script not found: scripts/import_rrs_csv.py"
+    fi
+    echo ""
+fi
+
 # Check if frontend needs building
 FRONTEND_DIST="web/chat/dist"
 FRONTEND_PKG="web/chat/package.json"

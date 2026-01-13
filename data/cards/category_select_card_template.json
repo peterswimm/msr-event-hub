@@ -1,0 +1,64 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Select a Research Category",
+      "size": "large",
+      "weight": "bolder"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Choose an area to explore projects:",
+      "wrap": true,
+      "spacing": "small"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "🤖 Artificial Intelligence (${ai_count})",
+      "data": {
+        "action": "filter_category",
+        "category": "Artificial Intelligence",
+        "query": "Show me all artificial intelligence projects"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "💻 Systems & Networking (${systems_count})",
+      "data": {
+        "action": "filter_category",
+        "category": "Systems and Networking",
+        "query": "List all systems and networking projects"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "🎨 HCI & Design (${hci_count})",
+      "data": {
+        "action": "filter_category",
+        "category": "HCI",
+        "query": "Show me HCI projects"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "🔒 Security & Privacy (${security_count})",
+      "data": {
+        "action": "filter_category",
+        "category": "Security",
+        "query": "Show me security projects"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "📊 Show All Categories",
+      "data": {
+        "action": "show_all_categories"
+      }
+    }
+  ]
+}

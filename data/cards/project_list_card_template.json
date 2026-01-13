@@ -1,0 +1,87 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${title}",
+      "size": "large",
+      "weight": "bolder"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Found ${count} projects",
+      "spacing": "small",
+      "color": "accent"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "**${project_title}**",
+                  "weight": "bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${research_area}",
+                  "size": "small",
+                  "color": "accent",
+                  "spacing": "none"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${description}",
+                  "wrap": true,
+                  "maxLines": 2,
+                  "spacing": "small"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "👥 ${team_members}",
+                  "size": "small",
+                  "spacing": "small"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "separator": true,
+      "spacing": "medium"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "View Details",
+      "data": {
+        "action": "view_project",
+        "project_id": "${project_id}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Show More Projects",
+      "data": {
+        "action": "load_more"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Refine Search",
+      "data": {
+        "action": "refine"
+      }
+    }
+  ]
+}

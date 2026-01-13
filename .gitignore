@@ -70,3 +70,15 @@ tmp/
 temp/
 docs/MSR_EventHub_Features and Stories.xlsx
 docs/~$MSR_EventHub_Features and Stories.xlsx
+# Phase-specific and debug files
+*_phase_*.sh
+*_phase_*.ps1
+CMK_*.md
+newCard*.json
+*.bak
+test_output.txt
+sse_probe.py
+quick_test.py
+validate_imports.py
+fix_recursive_calls.py
+fix_tests_phase_*.py

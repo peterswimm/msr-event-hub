@@ -51,6 +51,8 @@ const MessageInput = ({ onSend, onClear, disabled = false, disclaimer }: Message
         </div>
         <div className="message-input">
           <Textarea
+            id="chat-input"
+            name="chat-message"
             className="message-field"
             value={value}
             onChange={(e, data) => setValue(data.value)}
@@ -59,6 +61,7 @@ const MessageInput = ({ onSend, onClear, disabled = false, disclaimer }: Message
             placeholder="Type a new question..."
             resize="vertical"
             rows={5}
+            autoComplete="off"
           />
           <div className="message-actions">
             <Button

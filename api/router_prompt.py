@@ -245,7 +245,11 @@ INTENT_PATTERNS = {
         r"\bposters?\s+(about|related|on)\b",
         r"\bshow\s+me\s+projects?\b",
         r"\bfind\s+(project|poster)\b",
-        r"\bsearch\s+(project|poster)\b"
+        r"\bsearch\s+(project|poster)\b",
+        r"\bhelp\s+me\s+find\s+projects?\b",
+        r"\bprojects?\s+that\s+match\b",
+        r"\binterests\b.*\bproject\b",
+        r"\blist\s+(all\s+)?(artificial\s+intelligence|AI|systems|networking|machine\s+learning)\s+projects?\b"
     ],
     "project_detail": [
         r"\btell\s+me\s+about\b",
@@ -262,8 +266,8 @@ INTENT_PATTERNS = {
         r"\bpresented\s+by\b",
         r"\bteam\s+member\b",
         r"\bsubmitter\b",
-        r"\bwho\s+is\s+presenting\b",
-        r"'s\s+(project|poster)\b"
+        r"\bwho\s+is\s+presenting\b",        r"\bwho\s+(is|are)\s+on\b",
+        r"\bwhat\s+projects?\s+is\s+(\w+)\s+(working|on|presenting)\b",        r"'s\s+(project|poster)\b"
     ],
     "category_browse": [
         r"\bcategor(y|ies)\b",
@@ -285,7 +289,8 @@ INTENT_PATTERNS = {
         r"\bequipment\s+needs?\b",
         r"\bmonitor[s]?\b",
         r"\bdisplay[s]?\b",
-        r"\b(large|big)\s+display\b",
+        r"\b(large|big|big|large)\s+display\b",
+        r"\bwhich\s+projects?\s+need\s+(large\s+)?display\b",
         r"\b27[\"']?\s+monitor\b",
         r"\bAV\b",
         r"\btechnician\b"
@@ -299,7 +304,9 @@ INTENT_PATTERNS = {
         r"\bassigned\s+spot\b"
     ],
     "recording_status": [
-        r"\brecording\b.*\b(link|submitted|edited|status)\b",
+        r"\brecording\b.*\b(link|submitted|edited|status|available|have)\b",
+        r"\bhave\s+recording\b",
+        r"\bwhich\s+projects?\s+have\s+recording\b",
         r"\bvideo\b.*\b(link|available|ready)\b",
         r"\brecorded\b",
         r"\brecording\s+notes?\b"

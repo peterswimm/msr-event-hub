@@ -1,0 +1,326 @@
+{
+  "event": {
+    "id": "msr-event-2025",
+    "displayName": "MSR Event 2025",
+    "eventType": "conference",
+    "status": "active",
+    "startDate": "2025-03-15T09:00:00Z",
+    "endDate": "2025-03-17T18:00:00Z",
+    "timeZone": "America/Los_Angeles",
+    "location": {
+      "displayName": "Microsoft Research - Building 99",
+      "address": {
+        "street": "14820 NE 36th St",
+        "city": "Redmond",
+        "state": "WA",
+        "postalCode": "98052",
+        "countryOrRegion": "United States"
+      }
+    }
+  },
+  "projects": [
+    {
+      "id": "proj-001",
+      "eventId": "msr-event-2025",
+      "name": "Neural Code Intelligence",
+      "description": "Advanced AI models for code understanding and generation using transformer architectures",
+      "researchArea": "Artificial Intelligence",
+      "team": [
+        {
+          "displayName": "Dr. Sarah Chen",
+          "email": "sarahc@microsoft.com",
+          "role": "Principal Researcher"
+        },
+        {
+          "displayName": "Alex Rodriguez",
+          "email": "alexr@microsoft.com",
+          "role": "Senior Research Engineer"
+        }
+      ],
+      "papers": [
+        {
+          "title": "Transformer Models for Code Synthesis",
+          "url": "https://arxiv.org/example/001",
+          "publishedDate": "2024-11-15"
+        }
+      ],
+      "maturity": "prototype",
+      "equipment": ["Large Display", "Demo Laptop"],
+      "placement": "Innovation Zone A",
+      "requiresMonitor": true,
+      "recordingPermission": "allowed",
+      "commsStatus": "approved"
+    },
+    {
+      "id": "proj-002",
+      "eventId": "msr-event-2025",
+      "name": "Quantum Error Correction",
+      "description": "Novel approaches to error correction in quantum computing systems using topological codes",
+      "researchArea": "Quantum Computing",
+      "team": [
+        {
+          "displayName": "Dr. James Liu",
+          "email": "jamesliu@microsoft.com",
+          "role": "Principal Researcher"
+        }
+      ],
+      "papers": [],
+      "maturity": "early_research",
+      "equipment": ["Quantum Simulator Display", "Interactive Touchscreen"],
+      "placement": "Quantum Lab Section",
+      "requiresMonitor": true,
+      "recordingPermission": "restricted",
+      "commsStatus": "pending"
+    },
+    {
+      "id": "proj-003",
+      "eventId": "msr-event-2025",
+      "name": "Sustainable Cloud Infrastructure",
+      "description": "Energy-efficient datacenter designs using renewable energy and liquid cooling",
+      "researchArea": "Systems",
+      "team": [
+        {
+          "displayName": "Maria Garcia",
+          "email": "mariag@microsoft.com",
+          "role": "Senior Researcher"
+        },
+        {
+          "displayName": "Dr. Priya Sharma",
+          "email": "priyas@microsoft.com",
+          "role": "Principal Researcher"
+        }
+      ],
+      "papers": [
+        {
+          "title": "Carbon-Neutral Datacenters: A Systems Approach",
+          "url": "https://example.com/papers/sustainable-cloud",
+          "publishedDate": "2024-10-01"
+        }
+      ],
+      "repositories": [
+        {
+          "name": "sustainable-cloud-toolkit",
+          "url": "https://github.com/microsoft/sustainable-cloud-toolkit",
+          "description": "Tools for measuring and optimizing datacenter carbon footprint"
+        }
+      ],
+      "maturity": "production",
+      "equipment": ["Large Display", "Physical Model"],
+      "placement": "Systems Research Hall",
+      "requiresMonitor": false,
+      "recordingPermission": "allowed",
+      "commsStatus": "approved"
+    },
+    {
+      "id": "proj-004",
+      "eventId": "msr-event-2025",
+      "name": "Privacy-Preserving Machine Learning",
+      "description": "Federated learning techniques that enable model training without exposing sensitive data",
+      "researchArea": "Security & Privacy",
+      "team": [
+        {
+          "displayName": "Dr. Emily Watson",
+          "email": "emilyw@microsoft.com",
+          "role": "Principal Researcher"
+        }
+      ],
+      "papers": [
+        {
+          "title": "Differential Privacy in Federated Settings",
+          "url": "https://arxiv.org/example/privacy-fl",
+          "publishedDate": "2024-09-20"
+        }
+      ],
+      "maturity": "prototype",
+      "equipment": ["Demo Laptop", "Poster Display"],
+      "placement": "Security Research Zone",
+      "requiresMonitor": true,
+      "recordingPermission": "not_allowed",
+      "commsStatus": "approved"
+    },
+    {
+      "id": "proj-005",
+      "eventId": "msr-event-2025",
+      "name": "Accessibility in AR/VR",
+      "description": "Making augmented and virtual reality experiences accessible to users with disabilities",
+      "researchArea": "Human-Computer Interaction",
+      "team": [
+        {
+          "displayName": "Jordan Kim",
+          "email": "jordank@microsoft.com",
+          "role": "Senior Researcher"
+        },
+        {
+          "displayName": "Dr. Michael Brown",
+          "email": "michaelb@microsoft.com",
+          "role": "Principal Researcher"
+        }
+      ],
+      "papers": [],
+      "repositories": [
+        {
+          "name": "accessible-vr-toolkit",
+          "url": "https://github.com/microsoft/accessible-vr",
+          "description": "Library for building accessible VR experiences"
+        }
+      ],
+      "maturity": "prototype",
+      "equipment": ["VR Headsets", "Haptic Devices", "Demo Space"],
+      "placement": "HCI Demo Area",
+      "requiresMonitor": true,
+      "recordingPermission": "allowed",
+      "commsStatus": "approved"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "sess-001",
+      "eventId": "msr-event-2025",
+      "title": "Keynote: The Future of AI Research",
+      "sessionType": "keynote",
+      "speakers": [
+        {
+          "displayName": "Dr. Sarah Chen",
+          "email": "sarahc@microsoft.com"
+        }
+      ],
+      "schedule": {
+        "startDate": "2025-03-15T09:30:00Z",
+        "endDate": "2025-03-15T11:00:00Z",
+        "location": "Main Auditorium"
+      },
+      "description": "Opening keynote exploring cutting-edge developments in artificial intelligence and machine learning",
+      "targetAudience": "general",
+      "assets": {
+        "recording": "https://example.com/recordings/sess-001",
+        "slides": "https://example.com/slides/sess-001.pdf"
+      }
+    },
+    {
+      "id": "sess-002",
+      "eventId": "msr-event-2025",
+      "title": "Quantum Computing Workshop",
+      "sessionType": "workshop",
+      "speakers": [
+        {
+          "displayName": "Dr. James Liu",
+          "email": "jamesliu@microsoft.com"
+        }
+      ],
+      "schedule": {
+        "startDate": "2025-03-15T13:00:00Z",
+        "endDate": "2025-03-15T15:00:00Z",
+        "location": "Lab B - Quantum Wing"
+      },
+      "description": "Hands-on workshop on quantum error correction techniques",
+      "targetAudience": "technical",
+      "assets": {}
+    },
+    {
+      "id": "sess-003",
+      "eventId": "msr-event-2025",
+      "title": "Panel: Sustainable Computing",
+      "sessionType": "panel",
+      "speakers": [
+        {
+          "displayName": "Maria Garcia",
+          "email": "mariag@microsoft.com"
+        },
+        {
+          "displayName": "Dr. Priya Sharma",
+          "email": "priyas@microsoft.com"
+        }
+      ],
+      "schedule": {
+        "startDate": "2025-03-16T10:00:00Z",
+        "endDate": "2025-03-16T11:30:00Z",
+        "location": "Conference Room 3"
+      },
+      "description": "Panel discussion on building carbon-neutral cloud infrastructure",
+      "targetAudience": "leadership",
+      "assets": {
+        "recording": "https://example.com/recordings/sess-003"
+      }
+    },
+    {
+      "id": "sess-004",
+      "eventId": "msr-event-2025",
+      "title": "Project Showcase Tours",
+      "sessionType": "demo",
+      "speakers": [],
+      "schedule": {
+        "startDate": "2025-03-16T14:00:00Z",
+        "endDate": "2025-03-16T17:00:00Z",
+        "location": "Innovation Zone - All Areas"
+      },
+      "description": "Guided tours through all project demonstrations with Q&A",
+      "targetAudience": "general",
+      "assets": {}
+    }
+  ],
+  "people": [
+    {
+      "displayName": "Dr. Sarah Chen",
+      "email": "sarahc@microsoft.com",
+      "role": "Principal Researcher",
+      "researchAreas": ["Artificial Intelligence", "Machine Learning"],
+      "projects": ["proj-001"]
+    },
+    {
+      "displayName": "Alex Rodriguez",
+      "email": "alexr@microsoft.com",
+      "role": "Senior Research Engineer",
+      "researchAreas": ["Artificial Intelligence"],
+      "projects": ["proj-001"]
+    },
+    {
+      "displayName": "Dr. James Liu",
+      "email": "jamesliu@microsoft.com",
+      "role": "Principal Researcher",
+      "researchAreas": ["Quantum Computing"],
+      "projects": ["proj-002"]
+    },
+    {
+      "displayName": "Maria Garcia",
+      "email": "mariag@microsoft.com",
+      "role": "Senior Researcher",
+      "researchAreas": ["Systems", "Cloud Infrastructure"],
+      "projects": ["proj-003"]
+    },
+    {
+      "displayName": "Dr. Priya Sharma",
+      "email": "priyas@microsoft.com",
+      "role": "Principal Researcher",
+      "researchAreas": ["Systems", "Sustainability"],
+      "projects": ["proj-003"]
+    },
+    {
+      "displayName": "Dr. Emily Watson",
+      "email": "emilyw@microsoft.com",
+      "role": "Principal Researcher",
+      "researchAreas": ["Security & Privacy", "Machine Learning"],
+      "projects": ["proj-004"]
+    },
+    {
+      "displayName": "Jordan Kim",
+      "email": "jordank@microsoft.com",
+      "role": "Senior Researcher",
+      "researchAreas": ["Human-Computer Interaction", "Accessibility"],
+      "projects": ["proj-005"]
+    },
+    {
+      "displayName": "Dr. Michael Brown",
+      "email": "michaelb@microsoft.com",
+      "role": "Principal Researcher",
+      "researchAreas": ["Human-Computer Interaction", "AR/VR"],
+      "projects": ["proj-005"]
+    }
+  ],
+  "categories": [
+    "Artificial Intelligence",
+    "Quantum Computing",
+    "Systems",
+    "Security & Privacy",
+    "Human-Computer Interaction"
+  ]
+}

@@ -6,8 +6,14 @@ type HubChatParams = {
   signal?: AbortSignal;
 };
 
+type StreamPayload = {
+  delta?: string;
+  adaptive_card?: any;
+  context?: any;
+};
+
 // Streams chat responses from the hub backend, which should authenticate with Azure OpenAI using managed identity.
-export async function* streamHubChat({ baseUrl, messages, signal }: HubChatParams): AsyncGenerator<string, void, unknown> {
+export async function* streamHubChat({ baseUrl, messages, signal }: HubChatParams): AsyncGenerator<StreamPayload, void, unknown> {
   const url = `${baseUrl.replace(/\/$/, "")}/chat/stream`;
 
   const response = await fetch(url, {
@@ -42,11 +48,9 @@ export async function* streamHubChat({ baseUrl, messages, signal }: HubChatParam
       const payload = line.replace(/^data:\s*/, "");
       if (payload === "[DONE]") return;
       try {
-        const json = JSON.parse(payload);
-        const delta: string = json?.delta ?? json?.choices?.[0]?.delta?.content ?? "";
-        if (delta) {
-          yield delta;
-        }
+        const json: StreamPayload = JSON.parse(payload);
+        // Yield the full payload object (includes delta, adaptive_card, context)
+        yield json;
       } catch (err) {
         console.warn("Failed to parse hub stream chunk", err);
       }

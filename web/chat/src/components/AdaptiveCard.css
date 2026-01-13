@@ -1,0 +1,108 @@
+/* Adaptive Card Container - inherits parent theme */
+.adaptive-card-container {
+  background: var(--panel, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: var(--border-radius, 8px);
+  padding: 16px;
+  margin: 8px 0;
+  box-shadow: var(--shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+  font-family: inherit;
+  color: inherit;
+  max-width: 600px;
+}
+
+/* Dark mode support */
+.dark .adaptive-card-container {
+  background: var(--panel, #2d2d2d);
+  border-color: var(--border-color, #404040);
+  box-shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Card content inherits text styles */
+.adaptive-card-container * {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* Button styling - use brand colors */
+.adaptive-card-container button,
+.adaptive-card-container .ac-pushButton {
+  background: var(--colorBrandBackground, #0078d4);
+  color: var(--colorBrandForeground, #ffffff);
+  border: none;
+  border-radius: var(--border-radius, 6px);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.adaptive-card-container button:hover,
+.adaptive-card-container .ac-pushButton:hover {
+  background: var(--colorBrandBackgroundHover, #106ebe);
+}
+
+.adaptive-card-container button:active,
+.adaptive-card-container .ac-pushButton:active {
+  background: var(--colorBrandBackgroundPressed, #005a9e);
+}
+
+/* Input fields */
+.adaptive-card-container input,
+.adaptive-card-container select,
+.adaptive-card-container textarea {
+  background: var(--input-background, #ffffff);
+  border: 1px solid var(--border-color, #d0d0d0);
+  border-radius: var(--border-radius, 4px);
+  padding: 6px 12px;
+  font-size: 14px;
+  color: inherit;
+}
+
+.dark .adaptive-card-container input,
+.dark .adaptive-card-container select,
+.dark .adaptive-card-container textarea {
+  background: var(--input-background, #3a3a3a);
+  border-color: var(--border-color, #505050);
+}
+
+/* Responsive layout */
+.adaptive-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Action button container */
+.adaptive-card-container .ac-actionSet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Text blocks */
+.adaptive-card-container .ac-textBlock {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* Container spacing */
+.adaptive-card-container .ac-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Column set for responsive layouts */
+.adaptive-card-container .ac-columnSet {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adaptive-card-container .ac-column {
+  flex: 1;
+  min-width: 200px;
+}
