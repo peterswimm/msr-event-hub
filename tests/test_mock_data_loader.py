@@ -3,7 +3,7 @@ Tests for mock data loader functionality.
 """
 import pytest
 from pathlib import Path
-from api.mock_data_loader import MockDataLoader
+from src.api.mock_data_loader import MockDataLoader
 
 
 @pytest.fixture

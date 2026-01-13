@@ -8,7 +8,7 @@ caching and cache clearing behave as expected.
 import pytest
 from unittest.mock import patch, MagicMock
 
-from config.settings import Settings
+from src.config.settings import Settings
 
 
 def test_settings_load_from_env(monkeypatch):

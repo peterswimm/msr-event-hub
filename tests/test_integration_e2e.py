@@ -8,10 +8,10 @@ from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime
 from pathlib import Path
 
-from workflows.poc_workflow import POCWorkflowManager
-from core.schemas.base_schema import SourceType
+from src.workflows.poc_workflow import POCWorkflowManager
+from src.core.schemas.base_schema import SourceType
 from agents import ModernPaperAgent, ModernTalkAgent, ModernRepositoryAgent
-from evaluation.evaluators import ExpertReviewEvaluator
+from src.evaluation.evaluators import ExpertReviewEvaluator
 
 
 class TestPOCWorkflowInitialization:

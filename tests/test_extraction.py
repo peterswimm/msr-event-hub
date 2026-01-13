@@ -25,7 +25,7 @@ def test_base_schema():
     print("="*70)
 
     try:
-        from core.schemas import BaseKnowledgeArtifact, SourceType
+        from src.core.schemas import BaseKnowledgeArtifact, SourceType
 
         # Create a test artifact
         artifact = BaseKnowledgeArtifact(

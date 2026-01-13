@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from infra.database import DatabaseEngine, DatabaseConfig, get_db
 from infra.models import Base, ExecutionStatusEnum
-from repositories.sqlalchemy_repositories import (
+from src.core.repositories.sqlalchemy_repositories import (
     EventRepository, SessionRepository, ProjectRepository,
     KnowledgeArtifactRepository, PublishedKnowledgeRepository,
     EvaluationExecutionRepository

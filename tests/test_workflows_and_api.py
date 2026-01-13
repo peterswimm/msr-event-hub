@@ -4,24 +4,24 @@ import types
 import pytest
 
 from projects import ProjectDefinition
-from projects.repository import ProjectRepository
-from evaluation.hybrid_evaluator import HybridEvaluator
-from workflows.project_executor import ProjectExecutor
-from workflows.iteration_controller import IterationController
-from compilation.compiler import compile_project_summary
+from src.core.projects.repository import ProjectRepository
+from src.evaluation.hybrid_evaluator import HybridEvaluator
+from src.workflows.project_executor import ProjectExecutor
+from src.workflows.iteration_controller import IterationController
+from src.workflows.compilation.compiler import compile_project_summary
 from api import (
     get_projects_router,
     get_artifacts_router,
     get_evaluation_router,
     get_dashboard_router,
 )
-from api.projects_routes import (
+from src.api.projects_routes import (
     create_project_handler,
     update_project_handler,
     compile_project_handler,
     list_projects_handler,
 )
-from api.evaluation_routes import score_payload, run_project_iterations
+from src.api.evaluation_routes import score_payload, run_project_iterations
 
 
 # ===== Helper for PHASE B (Event-scoped projects) =====

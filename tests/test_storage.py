@@ -4,9 +4,9 @@ import tempfile
 from pathlib import Path
 import pytest
 
-from storage.base_repository import BaseRepository
-from storage.storage_manager import StorageManager
-from projects.repository import ProjectRepository
+from src.storage.base_repository import BaseRepository
+from src.storage.storage_manager import StorageManager
+from src.core.projects.repository import ProjectRepository
 from projects import ProjectDefinition
 
 

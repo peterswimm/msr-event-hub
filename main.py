@@ -32,17 +32,17 @@ try:
 except ImportError:
     HAS_FASTAPI = False
 
-from core.event_repository import EventRepository, SessionRepository
-from core.knowledge_repository import KnowledgeArtifactRepository, PublishedKnowledgeRepository
-from projects.repository import ProjectRepository
-from api.events_routes import get_events_router, get_sessions_router
-from api.projects_routes import get_projects_router
-from api.knowledge_routes import get_knowledge_router
-from api.workflow_routes import get_workflow_router
-from api.chat_routes import get_chat_router
-from workflows.project_executor import ProjectExecutor
-from workflows.iteration_controller import IterationController
-from evaluation.hybrid_evaluator import HybridEvaluator
+from src.core.event_repository import EventRepository, SessionRepository
+from src.core.knowledge_repository import KnowledgeArtifactRepository, PublishedKnowledgeRepository
+from src.core.projects.repository import ProjectRepository
+from src.api.events_routes import get_events_router, get_sessions_router
+from src.api.projects_routes import get_projects_router
+from src.api.knowledge_routes import get_knowledge_router
+from src.api.workflow_routes import get_workflow_router
+from src.api.chat_routes import get_chat_router
+from src.workflows.project_executor import ProjectExecutor
+from src.workflows.iteration_controller import IterationController
+from src.evaluation.hybrid_evaluator import HybridEvaluator
 
 # Configure logging
 logger = logging.getLogger(__name__)

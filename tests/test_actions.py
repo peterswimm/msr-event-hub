@@ -15,17 +15,17 @@ import asyncio
 from unittest.mock import Mock, AsyncMock, patch
 from typing import Any, Dict
 
-from api.actions.base import ActionRegistry, BaseActionHandler, get_registry
-from api.actions.decorators import register_action
-from api.actions.schemas import (
+from src.api.actions.base import ActionRegistry, BaseActionHandler, get_registry
+from src.api.actions.decorators import register_action
+from src.api.actions.schemas import (
     BrowseAllPayload,
     StatusFilterPayload,
     KeywordSearchPayload,
     ResearcherSearchPayload,
 )
-from api.actions.helpers import build_project_carousel, apply_filter, safe_truncate
-from api.conversation_context import ConversationContext
-from api.caching import SessionCache
+from src.api.actions.helpers import build_project_carousel, apply_filter, safe_truncate
+from src.api.conversation_context import ConversationContext
+from src.api.caching import SessionCache
 
 
 # Test fixtures
@@ -143,7 +143,7 @@ class TestBrowseAllHandler:
     @patch("storage.event_data.get_event_data")
     async def test_browse_all_execution(self, mock_get_data, mock_projects, context):
         """Test browse_all action execution."""
-        from api.actions.browse.handlers import BrowseAllHandler
+        from src.api.actions.browse.handlers import BrowseAllHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -160,7 +160,7 @@ class TestBrowseAllHandler:
     @pytest.mark.asyncio
     async def test_browse_all_context_update(self, context):
         """Test context update after browse_all."""
-        from api.actions.browse.handlers import BrowseAllHandler
+        from src.api.actions.browse.handlers import BrowseAllHandler
 
         handler = BrowseAllHandler("browse_all")
         await handler.update_context({}, context)
@@ -175,7 +175,7 @@ class TestFilterHandlers:
     @patch("storage.event_data.get_event_data")
     async def test_filter_by_status(self, mock_get_data, mock_projects, context):
         """Test filter_by_status handler."""
-        from api.actions.filter.handlers import FilterByStatusHandler
+        from src.api.actions.filter.handlers import FilterByStatusHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -191,7 +191,7 @@ class TestFilterHandlers:
     @patch("storage.event_data.get_event_data")
     async def test_filter_by_team_size(self, mock_get_data, mock_projects, context):
         """Test filter_by_team_size handler."""
-        from api.actions.filter.handlers import FilterByTeamSizeHandler
+        from src.api.actions.filter.handlers import FilterByTeamSizeHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -210,7 +210,7 @@ class TestSearchHandlers:
     @patch("storage.event_data.get_event_data")
     async def test_keyword_search(self, mock_get_data, mock_projects, context):
         """Test keyword_search handler."""
-        from api.actions.search.handlers import KeywordSearchHandler
+        from src.api.actions.search.handlers import KeywordSearchHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -226,7 +226,7 @@ class TestSearchHandlers:
     @patch("storage.event_data.get_event_data")
     async def test_researcher_search(self, mock_get_data, mock_projects, context):
         """Test researcher_search handler."""
-        from api.actions.search.handlers import ResearcherSearchHandler
+        from src.api.actions.search.handlers import ResearcherSearchHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -246,7 +246,7 @@ class TestNavigationHandlers:
     @patch("storage.event_data.get_event_data")
     async def test_view_project(self, mock_get_data, mock_projects, context):
         """Test view_project handler."""
-        from api.actions.navigation.handlers import ViewProjectHandler
+        from src.api.actions.navigation.handlers import ViewProjectHandler
 
         mock_get_data.return_value = {"projects": mock_projects}
 
@@ -263,7 +263,7 @@ class TestNavigationHandlers:
     @pytest.mark.asyncio
     async def test_back_to_results(self, context):
         """Test back_to_results handler."""
-        from api.actions.navigation.handlers import BackToResultsHandler
+        from src.api.actions.navigation.handlers import BackToResultsHandler
 
         # Set up previous results
         context.last_results = [{"id": "1", "name": "Project 1"}]
@@ -277,7 +277,7 @@ class TestNavigationHandlers:
     @pytest.mark.asyncio
     async def test_category_select(self, context):
         """Test category_select handler."""
-        from api.actions.navigation.handlers import CategorySelectHandler
+        from src.api.actions.navigation.handlers import CategorySelectHandler
 
         handler = CategorySelectHandler("category_select")
         payload = {"action": "category_select", "category": "AI"}

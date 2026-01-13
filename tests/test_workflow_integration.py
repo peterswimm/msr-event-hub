@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any
 
 from main import ApplicationContext
-from core.workflow_status import (
+from src.core.workflow_status import (
     EvaluationExecution,
     EvaluationExecutionRepository,
     ExecutionStatus,
@@ -19,9 +19,9 @@ from core.workflow_status import (
     ExecutionScorecard
 )
 from projects import ProjectDefinition
-from workflows.project_executor import ProjectExecutor
-from workflows.iteration_controller import IterationController
-from evaluation.hybrid_evaluator import HybridEvaluator
+from src.workflows.project_executor import ProjectExecutor
+from src.workflows.iteration_controller import IterationController
+from src.evaluation.hybrid_evaluator import HybridEvaluator
 
 
 class TestWorkflowComponentsIntegration:

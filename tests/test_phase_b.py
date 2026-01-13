@@ -4,13 +4,13 @@ import pytest
 from datetime import datetime
 from pathlib import Path
 
-from core.event_models import Event, Session, EventStatus, SessionType
-from core.knowledge_models import KnowledgeArtifact, PublishedKnowledge, ApprovalStatus, PKAProvenance
-from core.event_repository import EventRepository, SessionRepository
-from core.knowledge_repository import KnowledgeArtifactRepository, PublishedKnowledgeRepository
-from projects.models import ProjectDefinition
-from projects.repository import ProjectRepository
-from core.graph_models import ODataType
+from src.core.event_models import Event, Session, EventStatus, SessionType
+from src.core.knowledge_models import KnowledgeArtifact, PublishedKnowledge, ApprovalStatus, PKAProvenance
+from src.core.event_repository import EventRepository, SessionRepository
+from src.core.knowledge_repository import KnowledgeArtifactRepository, PublishedKnowledgeRepository
+from src.core.projects.models import ProjectDefinition
+from src.core.projects.repository import ProjectRepository
+from src.core.graph_models import ODataType
 
 
 @pytest.fixture

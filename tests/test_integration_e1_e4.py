@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from infra.models import Base, User
 from infra.database import DatabaseEngine
 from infra.authentication import AuthenticationManager
-from config.settings import Settings
+from src.config.settings import Settings
 from async_execution import JobQueue, JobModel, JobStatus
 from analytics import MetricsAggregator, DashboardAPI, DailyMetricsSummary
 from knowledge_graph import GraphDatabase_, Neo4jConfig, GraphNode, NodeType

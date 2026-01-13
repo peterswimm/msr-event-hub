@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from azure.core.exceptions import ResourceNotFoundError, AuthenticationError
 
-from config.key_vault import KeyVaultManager, get_key_vault_manager
+from src.config.key_vault import KeyVaultManager, get_key_vault_manager
 
 
 # ==========================

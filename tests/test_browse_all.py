@@ -4,7 +4,7 @@ import json
 import sys
 sys.path.insert(0, '.')
 
-from storage.event_data import get_event_data
+from src.storage.event_data import get_event_data
 
 # Helper function for safe text truncation
 def safe_truncate(text, max_length=120):

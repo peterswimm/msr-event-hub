@@ -9,8 +9,8 @@ from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime
 
 from agents import ModernPaperAgent, ModernTalkAgent, ModernRepositoryAgent
-from config.settings import Settings
-from core.schemas.base_schema import SourceType
+from src.config.settings import Settings
+from src.core.schemas.base_schema import SourceType
 
 
 class TestModernPaperAgent:

@@ -1,7 +1,7 @@
 """Query Router Integration Tests."""
 
 import pytest
-from api.query_router import DeterministicRouter
+from src.api.query_router import DeterministicRouter
 
 
 @pytest.fixture

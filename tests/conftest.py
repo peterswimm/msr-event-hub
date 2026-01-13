@@ -125,7 +125,7 @@ def sample_repo_info():
 @pytest.fixture
 def sample_paper_artifact():
     """Return sample PaperKnowledgeArtifact for testing."""
-    from core.schemas.paper_schema import PaperKnowledgeArtifact
+    from src.core.schemas.paper_schema import PaperKnowledgeArtifact
     
     return PaperKnowledgeArtifact(
         id="test-paper-001",
@@ -167,7 +167,7 @@ def sample_paper_artifact():
 @pytest.fixture
 def sample_talk_artifact():
     """Return sample TalkKnowledgeArtifact for testing."""
-    from core.schemas.talk_schema import TalkKnowledgeArtifact
+    from src.core.schemas.talk_schema import TalkKnowledgeArtifact
     
     return TalkKnowledgeArtifact(
         id="test-talk-001",
@@ -214,7 +214,7 @@ def sample_talk_artifact():
 @pytest.fixture
 def sample_repository_artifact():
     """Return sample RepositoryKnowledgeArtifact for testing."""
-    from core.schemas.repository_schema import RepositoryKnowledgeArtifact
+    from src.core.schemas.repository_schema import RepositoryKnowledgeArtifact
     
     return RepositoryKnowledgeArtifact(
         id="test-repo-001",
@@ -262,7 +262,7 @@ def sample_repository_artifact():
 @pytest.fixture
 def settings():
     """Return test settings."""
-    from config.settings import Settings
+    from src.config.settings import Settings
     
     settings = Settings()
     # Override with test values if needed

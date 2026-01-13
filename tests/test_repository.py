@@ -17,7 +17,7 @@ from projects import (
     ProjectAlreadyExistsError,
     StorageError,
 )
-from projects.repository import ProjectRepository
+from src.core.projects.repository import ProjectRepository
 
 
 # ===== Helper for PHASE B (Event-scoped projects) =====

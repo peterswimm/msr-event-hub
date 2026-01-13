@@ -22,7 +22,7 @@ from projects import (
     validate_project_artifacts_completeness,
     ValidationResult,
 )
-from projects.validators import (
+from src.core.projects.validators import (
     is_valid_id,
     is_valid_url,
     is_valid_year,

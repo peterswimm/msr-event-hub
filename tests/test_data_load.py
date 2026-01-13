@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from storage.event_data import get_event_data
+from src.storage.event_data import get_event_data
 
 data = get_event_data()
 print(f'Data loaded: {bool(data)}')

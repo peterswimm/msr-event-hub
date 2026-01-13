@@ -9,9 +9,9 @@ from pathlib import Path
 from datetime import datetime
 
 from main import ApplicationContext
-from core.event_models import Event, Session, EventType, EventStatus, SessionType
-from projects.models import ProjectDefinition
-from core.knowledge_models import KnowledgeArtifact, PKAProvenance, PublishedKnowledge, ApprovalStatus
+from src.core.event_models import Event, Session, EventType, EventStatus, SessionType
+from src.core.projects.models import ProjectDefinition
+from src.core.knowledge_models import KnowledgeArtifact, PKAProvenance, PublishedKnowledge, ApprovalStatus
 
 
 @pytest.fixture

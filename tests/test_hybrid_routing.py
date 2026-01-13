@@ -4,7 +4,7 @@ Integration tests for hybrid routing (deterministic + Foundry delegation).
 import pytest
 import os
 from unittest.mock import Mock, patch, AsyncMock
-from api.router_config import RouterConfig, RoutingStrategy, DataSource
+from src.api.router_config import RouterConfig, RoutingStrategy, DataSource
 
 
 class TestHybridRouting:
@@ -119,7 +119,7 @@ class TestHybridRouting:
 
     def test_foundry_config_object(self):
         """Test FoundryConfig dataclass initialization."""
-        from api.foundry_client import FoundryConfig
+        from src.api.foundry_client import FoundryConfig
         
         config = FoundryConfig(
             endpoint='https://test.cognitiveservices.azure.com',
@@ -195,7 +195,7 @@ class TestFoundryClientConfiguration:
 
     def test_foundry_client_manages_auth(self):
         """Test that FoundryClient handles managed identity authentication."""
-        from api.foundry_client import FoundryClient, FoundryConfig
+        from src.api.foundry_client import FoundryClient, FoundryConfig
         
         config = FoundryConfig(
             endpoint='https://test.cognitiveservices.azure.com',

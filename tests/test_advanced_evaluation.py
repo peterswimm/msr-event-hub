@@ -1,9 +1,9 @@
 """Tests for advanced evaluation components (scoring, suggestions, hybrid)."""
 
-from evaluation.advanced_scoring import AdvancedScorer
-from evaluation.suggestions import SuggestionEngine
-from evaluation.hybrid_evaluator import HybridEvaluator
-from evaluation.expert_review import ExpertReview, DimensionScore, ReviewDimension
+from src.evaluation.advanced_scoring import AdvancedScorer
+from src.evaluation.suggestions import SuggestionEngine
+from src.evaluation.hybrid_evaluator import HybridEvaluator
+from src.evaluation.expert_review import ExpertReview, DimensionScore, ReviewDimension
 
 
 def _sample_metrics():

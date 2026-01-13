@@ -6,10 +6,10 @@ Validates that all schema types correctly define and validate knowledge artifact
 import pytest
 from datetime import datetime
 
-from core.schemas.base_schema import BaseKnowledgeArtifact, SourceType
-from core.schemas.paper_schema import PaperKnowledgeArtifact
-from core.schemas.talk_schema import TalkKnowledgeArtifact
-from core.schemas.repository_schema import RepositoryKnowledgeArtifact
+from src.core.schemas.base_schema import BaseKnowledgeArtifact, SourceType
+from src.core.schemas.paper_schema import PaperKnowledgeArtifact
+from src.core.schemas.talk_schema import TalkKnowledgeArtifact
+from src.core.schemas.repository_schema import RepositoryKnowledgeArtifact
 
 
 class TestBaseKnowledgeArtifact:
