@@ -8,6 +8,12 @@ echo "======================================"
 echo "MSR Event Hub Startup"
 echo "======================================"
 echo ""
+
+# Get project root (script is in scripts/ subdirectory)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
 # Check if virtual environment exists
 if [ ! -d ".venv" ]; then
     echo "Creating Python virtual environment..."

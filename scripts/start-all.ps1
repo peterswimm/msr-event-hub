@@ -12,8 +12,8 @@ Write-Host "MSR Event Hub - Unified Startup" -ForegroundColor Cyan
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Get paths
-$chatPath = $PSScriptRoot
+# Get paths (script is in scripts/ subdirectory, so go up to project root first)
+$chatPath = Split-Path $PSScriptRoot -Parent
 $bridgePath = Join-Path (Split-Path $chatPath -Parent) "msr-event-agent-bridge"
 
 # Validate paths
@@ -123,7 +123,7 @@ if (-not (Test-Path $venvPath)) {
 
 Start-ServiceWindow -Title "Event Hub Chat Backend (Port 8000)" `
                    -WorkingDirectory $chatPath `
-                   -Command ".\start.ps1" `
+                   -Command ".\scripts\start.ps1" `
                    -Icon "🐍"
 Write-Host "✓ Chat backend starting on port 8000" -ForegroundColor Green
 

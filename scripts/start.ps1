@@ -7,6 +7,10 @@ Write-Host "MSR Event Hub Startup" -ForegroundColor Cyan
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Get project root (script is in scripts/ subdirectory)
+$projectRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $projectRoot
+
 # Check if virtual environment exists
 if (-not (Test-Path ".venv")) {
     Write-Host "Creating Python virtual environment..." -ForegroundColor Yellow
@@ -53,14 +57,14 @@ if ($env:AUTO_IMPORT_CSV -eq "true") {
 }
 
 # Check if frontend needs building
-$frontendDist = Join-Path $PSScriptRoot "web\chat\dist"
-$frontendPackageJson = Join-Path $PSScriptRoot "web\chat\package.json"
+$frontendDist = Join-Path $projectRoot "web\chat\dist"
+$frontendPackageJson = Join-Path $projectRoot "web\chat\package.json"
 
 if (Test-Path $frontendPackageJson) {
     if (-not (Test-Path $frontendDist)) {
         Write-Host "Frontend not built. Building..." -ForegroundColor Yellow
         
-        Push-Location (Join-Path $PSScriptRoot "web\chat")
+        Push-Location (Join-Path $projectRoot "web\chat")
         try {
             # Install dependencies if node_modules missing
             if (-not (Test-Path "node_modules")) {
@@ -99,7 +103,7 @@ Write-Host "Starting MSR Event Hub server..." -ForegroundColor Cyan
 Write-Host ""
 
 # Check for .env file
-$envFile = Join-Path $PSScriptRoot ".env"
+$envFile = Join-Path $projectRoot ".env"
 if (-not (Test-Path $envFile)) {
     Write-Host "⚠ No .env file found. Copy .env.example to .env and configure:" -ForegroundColor Yellow
     Write-Host "   cp .env.example .env" -ForegroundColor Yellow
