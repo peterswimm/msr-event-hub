@@ -80,7 +80,9 @@ class ResearcherSearchHandler(BaseActionHandler):
         try:
             researcher = payload.get("researcher", "").lower()
             if not researcher:
-                raise ValueError("Researcher parameter is required")
+                # Return a message prompting for researcher name
+                text = "Please enter a researcher name to search for their projects."
+                return text, None
 
             event_data = get_event_data()
             all_projects = event_data.get("projects", [])

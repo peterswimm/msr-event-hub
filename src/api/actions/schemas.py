@@ -136,7 +136,7 @@ class ResearcherSearchPayload(SearchPayload):
     """Schema for researcher_search action."""
 
     action: str = Field("researcher_search")
-    researcher: str = Field(..., min_length=1, description="Researcher name")
+    researcher: Optional[str] = Field(None, min_length=1, description="Researcher name")
     limit: int = Field(10, ge=1, le=100, description="Max results")
 
 
@@ -190,7 +190,7 @@ class CategorySelectPayload(NavigationPayload):
     """Schema for category_select action."""
 
     action: str = Field("category_select")
-    category: str = Field(..., min_length=1, description="Category to select")
+    category: Optional[str] = Field(None, min_length=1, description="Category name")
 
 
 # Payload type mapping for dynamic validation

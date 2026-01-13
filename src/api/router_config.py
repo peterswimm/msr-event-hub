@@ -55,7 +55,7 @@ class RouterConfig:
         # Data source configuration
         data_source_str = os.getenv('EVENT_DATA_SOURCE', 'api').lower()
         self.event_data_source = DataSource.API if data_source_str == 'api' else DataSource.MOCK
-        self.mock_data_path = os.getenv('MOCK_DATA_PATH', 'data/mock_event_data.json')
+        self.mock_data_path = os.getenv('MOCK_DATA_PATH', '.data/mock_event_data.json')
         
         # Foundry SaaS orchestration for complex queries
         self.delegate_to_foundry = self._get_bool_env('DELEGATE_TO_FOUNDRY', default=False)

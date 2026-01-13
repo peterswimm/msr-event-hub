@@ -12,7 +12,7 @@ from string import Template
 class AdaptiveCardRenderer:
     """Renders Adaptive Cards from templates with data binding."""
     
-    def __init__(self, templates_dir: str = "data/cards"):
+    def __init__(self, templates_dir: str = ".data/cards"):
         self.templates_dir = Path(templates_dir)
         self._template_cache: Dict[str, Dict[str, Any]] = {}
     

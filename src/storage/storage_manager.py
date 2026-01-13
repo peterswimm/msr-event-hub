@@ -15,7 +15,7 @@ from src.core.projects.exceptions import StorageError
 class StorageManager:
     """Manages storage directories for repositories."""
 
-    def __init__(self, base_dir: str = "data"):
+    def __init__(self, base_dir: str = ".data"):
         self.base_dir = Path(base_dir)
         self.projects_dir = self.base_dir / "projects"
         try:

@@ -43,6 +43,7 @@ from src.api.chat_routes import get_chat_router
 from src.workflows.project_executor import ProjectExecutor
 from src.workflows.iteration_controller import IterationController
 from src.evaluation.hybrid_evaluator import HybridEvaluator
+from src.api.action_init import initialize_action_handlers
 
 # Configure logging
 logger = logging.getLogger(__name__)

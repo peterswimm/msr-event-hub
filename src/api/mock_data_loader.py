@@ -246,10 +246,10 @@ def get_mock_loader(data_path: Optional[str] = None) -> MockDataLoader:
     
     if _mock_loader is None:
         if data_path is None:
-            # Default to data/mock_event_data.json relative to this file
+            # Default to .data/mock_event_data.json relative to this file
             api_dir = Path(__file__).parent
             project_root = api_dir.parent
-            data_path = str(project_root / 'data' / 'mock_event_data.json')
+            data_path = str(project_root / '.data' / 'mock_event_data.json')
         
         _mock_loader = MockDataLoader(data_path)
     

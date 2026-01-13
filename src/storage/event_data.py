@@ -12,7 +12,7 @@ from functools import lru_cache
 class EventDataLoader:
     """Loads and provides access to event and project data."""
     
-    def __init__(self, data_dir: str = "data"):
+    def __init__(self, data_dir: str = ".data"):
         self.data_dir = Path(data_dir)
         self._data_cache: Dict[str, Any] = {}
     

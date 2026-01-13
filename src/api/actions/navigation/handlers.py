@@ -166,7 +166,9 @@ class CategorySelectHandler(BaseActionHandler):
         try:
             category = payload.get("category", "")
             if not category:
-                raise ValueError("category parameter is required")
+                # Return a message prompting for category selection
+                text = "Please specify a category to browse projects."
+                return text, None
 
             logger.info(f"Category selected: {category}")
             return f"Category '{category}' selected.", None

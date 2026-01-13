@@ -17,6 +17,9 @@ from datetime import datetime
 import requests
 from azure.identity import DefaultAzureCredential
 
+# Import action system to ensure handlers are registered
+from src.api import action_init  # noqa: F401
+
 try:
     from fastapi import APIRouter, HTTPException
     from fastapi.responses import StreamingResponse
