@@ -14,6 +14,7 @@ All responses follow Microsoft Graph conventions with @odata.type, @odata.etag, 
 
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -44,6 +45,11 @@ from src.workflows.project_executor import ProjectExecutor
 from src.workflows.iteration_controller import IterationController
 from src.evaluation.hybrid_evaluator import HybridEvaluator
 from src.api.action_init import initialize_action_handlers
+from src.observability.telemetry import (
+    initialize_telemetry,
+    track_api_request,
+    flush_telemetry
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -115,6 +121,12 @@ def create_app(storage_root: Optional[Path] = None) -> Optional[FastAPI]:
         logger.warning("FastAPI not available; cannot create web application")
         return None
 
+    logger.info("="*60)
+    logger.info("Creating FastAPI application...")
+    
+    # Initialize telemetry
+    initialize_telemetry(os.getenv("APPINSIGHTS_INSTRUMENTATION_KEY"))
+
     app = FastAPI(
         title="MSR Event Hub API",
         description="Event-scoped knowledge management with hybrid query routing and multi-agent orchestration",
@@ -122,6 +134,23 @@ def create_app(storage_root: Optional[Path] = None) -> Optional[FastAPI]:
         docs_url="/docs",
         openapi_url="/openapi.json"
     )
+    
+    # Telemetry middleware
+    @app.middleware("http")
+    async def telemetry_middleware(request, call_next):
+        """Track API request metrics."""
+        start_time = time.time()
+        response = await call_next(request)
+        duration_ms = (time.time() - start_time) * 1000
+        
+        track_api_request(
+            method=request.method,
+            path=request.url.path,
+            status_code=response.status_code,
+            duration_ms=duration_ms
+        )
+        
+        return response
     
     # Initialize application context
     ctx = ApplicationContext(storage_root=storage_root)
