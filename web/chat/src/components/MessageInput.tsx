@@ -1,6 +1,47 @@
-import { Button, Textarea } from "@fluentui/react-components";
-import { Mic24Regular, Send32Regular, SpeakerMute24Regular, Broom16Regular, Info16Regular } from "@fluentui/react-icons";
+import { Button, Textarea, Toolbar, ToolbarButton, makeStyles, tokens, shorthands } from "@fluentui/react-components";
+import { Mic24Regular, Send24Regular, SpeakerMute24Regular, Broom16Regular, Info16Regular } from "@fluentui/react-icons";
 import { useCallback, useState } from "react";
+
+const useStyles = makeStyles({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    ...shorthands.gap(tokens.spacingVerticalS),
+    ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingHorizontalS),
+  },
+  inputRow: {
+    display: "flex",
+    alignItems: "center",
+  },
+  inputWrapper: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    ...shorthands.gap(tokens.spacingVerticalXS),
+    ...shorthands.borderRadius(tokens.borderRadiusMedium),
+    ...shorthands.border("1px", "solid", tokens.colorNeutralStroke1),
+    ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingHorizontalS),
+  },
+  textarea: {
+    ...shorthands.border("none"),
+    backgroundColor: "transparent",
+  },
+  actionsRow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    ...shorthands.gap(tokens.spacingHorizontalXS),
+  },
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  disclaimer: {
+    color: tokens.colorNeutralForeground3,
+    fontSize: tokens.fontSizeBase200,
+  },
+});
 
 type MessageInputProps = {
   onSend: (text: string) => void;
@@ -10,6 +51,7 @@ type MessageInputProps = {
 };
 
 const MessageInput = ({ onSend, onClear, disabled = false, disclaimer }: MessageInputProps) => {
+  const styles = useStyles();
   const [value, setValue] = useState("");
   const [isMuted, setIsMuted] = useState(true);
 
@@ -28,62 +70,62 @@ const MessageInput = ({ onSend, onClear, disabled = false, disclaimer }: Message
   };
 
   return (
-    <div className="message-input-container">
-      <div className="message-input-toolbar">
-        <Button
-          appearance="subtle"
-          icon={<SpeakerMute24Regular />}
-          disabled={disabled}
-          onClick={() => setIsMuted(!isMuted)}
-          aria-label={isMuted ? "Unmute" : "Mute"}
-          title={isMuted ? "Unmute" : "Mute"}
-        />
-      </div>
-      <div className="message-input-wrapper">
-        <div className="message-input-left">
-          <Button
-            appearance="subtle"
-            icon={<Broom16Regular />}
-            disabled={disabled}
-            onClick={onClear}
-            aria-label="clear chat button"
-          />
-        </div>
-        <div className="message-input">
+    <div className={styles.container}>
+      <div className={styles.inputRow}>
+        <div className={styles.inputWrapper}>
           <Textarea
             id="chat-input"
             name="chat-message"
-            className="message-field"
+            className={styles.textarea}
             value={value}
             onChange={(e, data) => setValue(data.value)}
             onKeyDown={handleKeyDown}
             disabled={disabled}
             placeholder="Type a new question..."
-            resize="vertical"
-            rows={5}
+            resize="none"
+            rows={3}
             autoComplete="off"
           />
-          <div className="message-actions">
-            <Button
-              appearance="subtle"
-              icon={<Mic24Regular />}
-              disabled={disabled}
-              title="Start recording"
-              aria-label="Start recording"
-            />
-            <Button
-              appearance="subtle"
-              icon={<Send32Regular />}
-              disabled={disabled || !value.trim()}
-              onClick={handleSend}
-              aria-label="Ask question button"
-            />
+          <div className={styles.actionsRow}>
+            <Toolbar aria-label="Chat actions" className={styles.actionsRow}>
+              <ToolbarButton
+                appearance="subtle"
+                icon={<SpeakerMute24Regular />}
+                disabled={disabled}
+                onClick={() => setIsMuted(!isMuted)}
+                aria-label={isMuted ? "Unmute" : "Mute"}
+                title={isMuted ? "Unmute" : "Mute"}
+              />
+              <ToolbarButton
+                appearance="subtle"
+                icon={<Broom16Regular />}
+                disabled={disabled}
+                onClick={onClear}
+                aria-label="Clear chat"
+                title="Clear chat"
+              />
+              <ToolbarButton
+                appearance="subtle"
+                icon={<Mic24Regular />}
+                disabled={disabled}
+                title="Start recording"
+                aria-label="Start recording"
+              />
+              <ToolbarButton
+                appearance="subtle"
+                icon={<Send24Regular />}
+                disabled={disabled || !value.trim()}
+                onClick={handleSend}
+                aria-label="Send message"
+                title="Send"
+              />
+            </Toolbar>
           </div>
         </div>
       </div>
-      <div className="message-input-footer">
+      <div className={styles.footer}>
         {disclaimer ? (
-          <div className="input-disclaimer">
+          <div className={styles.disclaimer}>
             <em>{disclaimer}</em>
           </div>
         ) : null}

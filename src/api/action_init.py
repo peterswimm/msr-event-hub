@@ -26,6 +26,7 @@ def initialize_action_handlers():
         from src.api.actions.filter import handlers as filter_handlers  # noqa: F401
         from src.api.actions.search import handlers as search_handlers  # noqa: F401
         from src.api.actions.navigation import handlers as nav_handlers  # noqa: F401
+        from src.api.actions.experiences import handlers as experience_handlers  # noqa: F401
 
         from src.api.actions.base import get_registry
 

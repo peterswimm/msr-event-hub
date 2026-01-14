@@ -178,15 +178,7 @@ def get_chat_router():
         welcome_card = renderer.render_welcome_card()
 
         return {
-            "message": "Welcome to MSR Event Hub Chat! 🎓",
-            "description": "I can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
-            "examples": [
-                {"title": "Find AI projects", "prompt": "Show me all artificial intelligence projects"},
-                {"title": "Search by team member", "prompt": "What projects is Alice working on?"},
-                {"title": "Browse by category", "prompt": "List all systems and networking projects"},
-                {"title": "Equipment requirements", "prompt": "Which projects need a large display?"},
-                {"title": "Recording status", "prompt": "Which projects have recording available?"},
-            ],
+            "message": "",
             "adaptive_card": welcome_card,
         }
 

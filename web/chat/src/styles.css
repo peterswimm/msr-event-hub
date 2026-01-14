@@ -1,28 +1,15 @@
+/* Minimal global styles - rely on Fluent v9 defaults for everything else */
+
 :root {
   color-scheme: light;
-  --bg: #f2f2f2;
-  --panel: #ffffff;
-  --header-bg: #f0f0f0;
-  --shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.08);
-  --border-radius: 8px;
 }
 
 html.dark {
   color-scheme: dark;
-  --bg: #0f0f0f;
-  --panel: #0f0f0f;
-  --header-bg: #252525;
-  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.35);
 }
 
 * {
   box-sizing: border-box;
-}
-
-.loading-message {
-  padding: 20px;
-  text-align: center;
-  color: #999;
 }
 
 html,
@@ -33,228 +20,18 @@ body,
   font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--bg);
 }
 
+/* Hide Fluent UI internal elements */
 [data-tabster-dummy] {
   display: none !important;
 }
-.chat-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
 
-.chat-header,
-.chat-footer {
-  background: var(--panel);
-  padding: 0;
-  box-shadow: none;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.suggestion-buttons .fui-Button {
-  padding: 16px 18px;
-  min-width: 260px;
-  justify-content: flex-start;
-}
-
-.chat-main {
-  background: var(--bg);
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 400px) {
-  .chat-main {
-    padding: 0;
-  }
-}
-
-.message-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px;
-  max-width: 1080px;
-  width: 100%;
-  margin: 0 auto;
-  flex: 1;
-  overflow-y: auto;
-  align-items: stretch;
-}
-
-.message-card {
-  background: var(--panel);
-  border-radius: var(--border-radius);
-  padding: 20px;
-  box-shadow: var(--shadow);
-  color: #ffffff;
-}
-
-.message-card.user {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.message-card.assistant {
-  background: var(--panel);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-}
-
-.answer-markdown {
-  line-height: 1.5;
-  color: #ffffff;
-}
-.answer-markdown .md-list {
-  padding-left: 20px;
-}
-.answer-markdown .md-code {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 2px 6px;
-  color: #ffffff;
-}
-.answer-markdown .md-pre {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 10px;
-  overflow-x: auto;
-  color: #ffffff;
-}
-
-.message-input-container {
-  max-width: 1080px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-.message-input-toolbar {
-  display: flex;
-  justify-content: flex-start;
-  padding: 8px 10px;
-}
-
-.message-input {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  padding: 10px;
-  background: var(--panel);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-}
-
-.message-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.message-actions .fui-Button {
-  min-width: 44px;
-  height: 40px;
-}
-
-.message-input-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  gap: 10px;
-}
-
-/* Additional status cards and utilities to style notifications */
-.status-card {
-  background: var(--panel);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 16px 20px;
-  max-width: 1080px;
-  width: 100%;
-  margin: 10px auto;
-}
-
-.status-card .status-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.status-card.warning {
-  border-left: 4px solid #ffaa44;
-}
-
-.status-card.error {
-  border-left: 4px solid #f1707b;
-}
-
-.streaming-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 1080px;
-  width: 100%;
-  margin: 8px auto;
-}
-
-/* Field layout inside input */
-.message-field {
-  width: 100%;
-}
-/* Input row layout on wider screens */
-.message-input {
-  align-items: stretch;
-}
-
-.streaming-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #f0f4ff;
-  border: 1px solid #d6e2ff;
-  border-radius: 10px;
-  width: fit-content;
-}
-
-.suggestion-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.status-card {
-  border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #e3e3e3;
-  background: #fdfdfd;
-  display: grid;
+/* Simple loading state */
+.loading-message {
+  padding: 16px;
+  text-align: center;
+  color: #616161;
   gap: 6px;
 }
 
@@ -449,12 +226,20 @@ body,
     align-items: flex-start;
   }
 
-  .message-input {
+  .message-input-row {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .message-input button {
+  .message-input {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .message-actions {
+    justify-content: flex-end;
     width: 100%;
+    margin-left: 0;
   }
 }
 

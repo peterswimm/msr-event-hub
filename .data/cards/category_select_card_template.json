@@ -4,61 +4,352 @@
   "version": "1.5",
   "body": [
     {
-      "type": "TextBlock",
-      "text": "Select a Research Category",
-      "size": "large",
-      "weight": "bolder"
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Event Management",
+          "size": "large",
+          "weight": "bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Organizer Tools & System Status",
+          "size": "medium",
+          "color": "accent",
+          "spacing": "none"
+        }
+      ]
     },
     {
       "type": "TextBlock",
-      "text": "Choose an area to explore projects:",
-      "wrap": true,
+      "text": "System Status",
+      "weight": "bolder",
+      "size": "medium",
+      "spacing": "medium"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Component",
+              "weight": "bolder"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Status",
+              "weight": "bolder",
+              "horizontalAlignment": "center"
+            }
+          ]
+        }
+      ],
+      "separator": true,
       "spacing": "small"
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "title": "🤖 Artificial Intelligence (${ai_count})",
-      "data": {
-        "action": "filter_category",
-        "category": "Artificial Intelligence",
-        "query": "Show me all artificial intelligence projects"
-      }
     },
     {
-      "type": "Action.Submit",
-      "title": "💻 Systems & Networking (${systems_count})",
-      "data": {
-        "action": "filter_category",
-        "category": "Systems and Networking",
-        "query": "List all systems and networking projects"
-      }
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Chat Service"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Action.Submit",
-      "title": "🎨 HCI & Design (${hci_count})",
-      "data": {
-        "action": "filter_category",
-        "category": "HCI",
-        "query": "Show me HCI projects"
-      }
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Project Database"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Action.Submit",
-      "title": "🔒 Security & Privacy (${security_count})",
-      "data": {
-        "action": "filter_category",
-        "category": "Security",
-        "query": "Show me security projects"
-      }
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Session Scheduler"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Action.Submit",
-      "title": "📊 Show All Categories",
-      "data": {
-        "action": "show_all_categories"
-      }
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Analytics Pipeline"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Organizer Tools",
+      "weight": "bolder",
+      "size": "medium",
+      "spacing": "medium",
+      "separator": true
+    },
+    {
+      "type": "ColumnSet",
+      "spacing": "small",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "minHeight": "100px",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📊",
+                  "size": "extraLarge",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Attendance Reports",
+                  "weight": "bolder",
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Export metrics",
+                  "size": "small",
+                  "isSubtle": true,
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "organizer_tools",
+                  "tool": "attendance_report"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "minHeight": "100px",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📋",
+                  "size": "extraLarge",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Manage Submissions",
+                  "weight": "bolder",
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Review projects",
+                  "size": "small",
+                  "isSubtle": true,
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "organizer_tools",
+                  "tool": "manage_submissions"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "spacing": "small",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "minHeight": "100px",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "🎥",
+                  "size": "extraLarge",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Recording Manager",
+                  "weight": "bolder",
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Update status",
+                  "size": "small",
+                  "isSubtle": true,
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "organizer_tools",
+                  "tool": "recording_management"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "minHeight": "100px",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📧",
+                  "size": "extraLarge",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Communications",
+                  "weight": "bolder",
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Broadcast messages",
+                  "size": "small",
+                  "isSubtle": true,
+                  "horizontalAlignment": "center",
+                  "wrap": true
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "organizer_tools",
+                  "tool": "communications"
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

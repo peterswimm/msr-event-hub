@@ -1,0 +1,28 @@
+{
+  "name": "@msr/types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types for MSR Event Agent Chat",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "msr",
+    "types",
+    "typescript"
+  ],
+  "author": "MSR Event Agent Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

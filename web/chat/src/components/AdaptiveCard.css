@@ -1,51 +1,61 @@
 /* Adaptive Card Container - inherits parent theme */
 .adaptive-card-container {
-  background: var(--panel, #ffffff);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: var(--border-radius, 8px);
-  padding: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0;
   margin: 8px 0;
-  box-shadow: var(--shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
-  font-family: inherit;
-  color: inherit;
+  font-family: var(--fontFamilyBase, 'Segoe UI', system-ui, sans-serif);
+  color: var(--colorNeutralForeground1, #242424);
   max-width: 600px;
 }
 
-/* Dark mode support */
+/* Dark mode text colors */
 .dark .adaptive-card-container {
-  background: var(--panel, #2d2d2d);
-  border-color: var(--border-color, #404040);
-  box-shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.3));
+  color: var(--colorNeutralForeground1, #F5F5F5);
 }
 
-/* Card content inherits text styles */
-.adaptive-card-container * {
-  font-family: inherit;
+/* Override Adaptive Card's internal styling to inherit properly */
+.adaptive-card-container .ac-container {
+  background: transparent !important;
+}
+
+.adaptive-card-container .ac-textBlock {
   color: inherit;
 }
 
-/* Button styling - use brand colors */
+/* Button styling - use Fluent UI brand tokens */
 .adaptive-card-container button,
 .adaptive-card-container .ac-pushButton {
-  background: var(--colorBrandBackground, #0078d4);
-  color: var(--colorBrandForeground, #ffffff);
+  background: var(--colorBrandBackground, #0F6CBD);
+  color: #FFFFFF;
   border: none;
-  border-radius: var(--border-radius, 6px);
-  padding: 8px 16px;
+  border-radius: 4px;
+  padding: 6px 12px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  transition: background 0.1s ease;
+  font-family: inherit;
 }
 
 .adaptive-card-container button:hover,
 .adaptive-card-container .ac-pushButton:hover {
-  background: var(--colorBrandBackgroundHover, #106ebe);
+  background: var(--colorBrandBackgroundHover, #115EA3);
 }
 
 .adaptive-card-container button:active,
 .adaptive-card-container .ac-pushButton:active {
-  background: var(--colorBrandBackgroundPressed, #005a9e);
+  background: var(--colorBrandBackgroundPressed, #0F548C);
+}
+
+/* Positive style buttons (primary actions) */
+.adaptive-card-container .ac-pushButton.style-positive {
+  background: var(--colorCompoundBrandBackground, #0F6CBD);
+}
+
+.adaptive-card-container .ac-pushButton.style-positive:hover {
+  background: var(--colorCompoundBrandBackgroundHover, #115EA3);
 }
 
 /* Input fields */
@@ -99,10 +109,46 @@
 .adaptive-card-container .ac-columnSet {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--colorNeutralStroke1, #C8C8C8) transparent;
+}
+
+/* Horizontal scroll styling for webkit browsers */
+.adaptive-card-container .ac-columnSet::-webkit-scrollbar {
+  height: 6px;
+}
+
+.adaptive-card-container .ac-columnSet::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.adaptive-card-container .ac-columnSet::-webkit-scrollbar-thumb {
+  background: var(--colorNeutralStroke1, #C8C8C8);
+  border-radius: 3px;
+}
+
+.adaptive-card-container .ac-columnSet::-webkit-scrollbar-thumb:hover {
+  background: var(--colorNeutralStroke1Hover, #A0A0A0);
 }
 
 .adaptive-card-container .ac-column {
-  flex: 1;
-  min-width: 200px;
+  flex: 0 0 auto;
+  min-width: 250px;
+  scroll-snap-align: start;
+}
+
+/* Make emphasis containers interactive */
+.adaptive-card-container .ac-container[style*="emphasis"] {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.adaptive-card-container .ac-container[style*="emphasis"]:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
 }

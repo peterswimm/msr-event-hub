@@ -1,16 +1,45 @@
 {
-  "name": "frontend",
+  "name": "@msr/webchat",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "MSR Event Hub Chat - Atomic, embeddable webchat component",
+  "main": "dist-lib/index.mjs",
+  "types": "dist-lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist-lib/index.mjs",
+      "types": "./dist-lib/index.d.ts"
+    },
+    "./styles": "./src/index.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "watch": "tsc && vite build --watch"
+    "build:lib": "BUILD_MODE=lib tsc && vite build",
+    "build:all": "npm run build && npm run build:lib",
+    "watch": "tsc && vite build --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "a11y": "echo 'Run dev server with VITE_A11Y=true to enable axe-core runtime checks'"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
   },
   "dependencies": {
     "@fluentui/react-components": "^9.58.4",
     "@fluentui/react-icons": "^2.0.234",
+    "@msr/types": "*",
     "@tanstack/react-query": "^5.45.0",
     "adaptivecards": "^3.0.5",
     "adaptivecards-templating": "^2.3.1",
@@ -19,10 +48,18 @@
     "react-markdown": "^9.0.0"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.11.0",
     "@types/lodash-es": "^4.17.7",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^5.1.2",
+    "axe-core": "^4.11.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "prettier": "^2.8.3",
     "typescript": "^4.9.3",
     "vite": "^7.3.1"

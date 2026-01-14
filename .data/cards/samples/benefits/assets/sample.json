@@ -1,0 +1,54 @@
+[
+  {
+    "name": "pnp-adaptivecards-samples-benefits",
+    "source": "pnp",
+    "title": "News and article listing Adaptive Card design",
+    "shortDescription": "Adaptive Card design for presenting news and company updates with numerous referenced articles or posts.",
+    "url": "https://github.com/pnp/AdaptiveCards-Templates/tree/main/samples/benefits",
+    "longDescription": [
+      "Adaptive Card design for presenting news and company updates with numerous referenced articles or posts."
+    ],
+    "creationDateTime": "2021-12-20",
+    "updateDateTime": "2021-12-20",
+    "products": [
+      "Viva"
+    ],
+    "metadata": [
+    ],
+"tags": [],
+    "categories": [
+    ],
+    "preview": {
+      "label": "Open in Designer",
+      "url": "https://adaptivecards.io/designer/index.html?card=https%3A%2F%2Fraw.githubusercontent.com%2Fpnp%2FAdaptiveCards-Templates%2Fmain%2Fsamples%2Fbenefits%2Fac-qv-benefits.json"
+    },
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/AdaptiveCards-Templates/main/samples/benefits/assets/card.png",
+        "alt": "Preview"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "VesaJuvonen",
+        "company": "Microsoft",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/7446437?v=4",
+        "name": "Vesa Juvonen"
+      }
+    ],
+    "references": [
+      {
+        "name": "Overview of Viva Connections Extensibility",
+        "description": "Building extensibility for the Microsoft Viva Connections.",
+        "url": "https://docs.microsoft.com/en-us/sharepoint/dev/spfx/viva/overview-viva-connections?WT.mc_id=m365-15741-cxa"
+      },
+      {
+        "name": "Designing Viva Connections custom cards for your dashboard",
+        "description": "Design guidance for the Viva Cards.",
+        "url": "https://docs.microsoft.com/en-us/sharepoint/dev/spfx/viva/design/designing-card?WT.mc_id=m365-15741-cxa"
+      }
+    ]
+  }
+]

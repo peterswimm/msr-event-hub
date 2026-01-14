@@ -1,8 +1,2 @@
-export type ChatRole = "system" | "user" | "assistant";
-
-export type ChatMessage = {
-  id: string;
-  role: ChatRole;
-  content: string;
-  adaptive_card?: any; // Adaptive Card JSON payload
-};
+// Re-export types from shared @msr/types package
+export type { ChatMessage, ChatRole, AdaptiveCardPayload, CardActionData, StreamChunk, ChatRequest, ChatResponse } from "@msr/types";

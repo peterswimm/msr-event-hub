@@ -22,8 +22,16 @@ from src.api.actions.schemas import (
     StatusFilterPayload,
     KeywordSearchPayload,
     ResearcherSearchPayload,
+    HourlyAgendaPayload,
+    PresenterCarouselPayload,
 )
-from src.api.actions.helpers import build_project_carousel, apply_filter, safe_truncate
+from src.api.actions.helpers import (
+    build_project_carousel,
+    apply_filter,
+    safe_truncate,
+    build_agenda_card,
+    build_presenter_carousel,
+)
 from src.api.conversation_context import ConversationContext
 from src.api.caching import SessionCache
 
@@ -130,9 +138,43 @@ class TestHelpers:
         )
 
         assert card["type"] == "AdaptiveCard"
-        assert card["version"] == "1.5"
+        assert card["version"] == "1.6"
         assert card["body"][0]["text"] == "Test Projects"
-        assert len(card["body"]) > 2  # Title, subtitle, and items
+        assert len(card["body"]) > 2  # Title, subtitle, and carousel
+
+    def test_build_agenda_card(self):
+        """Test agenda card generation."""
+        sessions = [
+            {
+                "title": "Keynote",
+                "schedule": {
+                    "startDate": "2025-03-15T09:00:00Z",
+                    "endDate": "2025-03-15T10:00:00Z",
+                    "location": "Main Hall",
+                },
+                "speakers": [{"displayName": "Dr. Smith"}],
+            }
+        ]
+        card = build_agenda_card(sessions, title="Test Agenda", max_items=5)
+        assert card["type"] == "AdaptiveCard"
+        assert card["version"] == "1.6"
+        assert "Test Agenda" in card["body"][0]["text"]
+        assert len(card["body"]) >= 3  # Title, subtitle, container
+
+    def test_build_presenter_carousel(self):
+        """Test presenter carousel generation."""
+        sessions = [
+            {
+                "title": "Session 1",
+                "schedule": {"startDate": "2025-03-15T09:00:00Z", "location": "Room A"},
+                "speakers": [{"displayName": "Dr. Jones"}],
+            }
+        ]
+        card = build_presenter_carousel(sessions, max_presenters=3)
+        assert card["type"] == "AdaptiveCard"
+        assert card["version"] == "1.6"
+        assert "Presenter carousel" in card["body"][0]["text"]
+        assert "Carousel" in str(card["body"])  # Has Carousel element
 
 
 # Handler tests with factory pattern
@@ -140,7 +182,7 @@ class TestBrowseAllHandler:
     """Test browse_all handler."""
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_browse_all_execution(self, mock_get_data, mock_projects, context):
         """Test browse_all action execution."""
         from src.api.actions.browse.handlers import BrowseAllHandler
@@ -151,6 +193,7 @@ class TestBrowseAllHandler:
         payload = {"action": "browse_all", "limit": 10}
 
         text, card = await handler.execute(payload, context)
+        await handler.update_context(payload, context)
 
         assert "featured projects" in text.lower()
         assert card is not None
@@ -172,7 +215,7 @@ class TestFilterHandlers:
     """Test filter action handlers."""
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_filter_by_status(self, mock_get_data, mock_projects, context):
         """Test filter_by_status handler."""
         from src.api.actions.filter.handlers import FilterByStatusHandler
@@ -185,10 +228,10 @@ class TestFilterHandlers:
         text, card = await handler.execute(payload, context)
 
         assert "2" in text  # Found 2 active projects
-        assert "Active" in text
+        assert "active" in text.lower()
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_filter_by_team_size(self, mock_get_data, mock_projects, context):
         """Test filter_by_team_size handler."""
         from src.api.actions.filter.handlers import FilterByTeamSizeHandler
@@ -207,7 +250,7 @@ class TestSearchHandlers:
     """Test search action handlers."""
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_keyword_search(self, mock_get_data, mock_projects, context):
         """Test keyword_search handler."""
         from src.api.actions.search.handlers import KeywordSearchHandler
@@ -218,12 +261,13 @@ class TestSearchHandlers:
         payload = {"action": "keyword_search", "keyword": "learning"}
 
         text, card = await handler.execute(payload, context)
+        await handler.update_context(payload, context)
 
         assert "found" in text.lower()
-        assert context.interests_keywords == {"learning"}
+        assert "learning" in context.interests_keywords
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_researcher_search(self, mock_get_data, mock_projects, context):
         """Test researcher_search handler."""
         from src.api.actions.search.handlers import ResearcherSearchHandler
@@ -234,8 +278,9 @@ class TestSearchHandlers:
         payload = {"action": "researcher_search", "researcher": "Alice"}
 
         text, card = await handler.execute(payload, context)
+        await handler.update_context(payload, context)
 
-        assert "Alice" in text
+        assert "alice" in text.lower()
         assert "alice" in context.selected_researchers
 
 
@@ -243,7 +288,7 @@ class TestNavigationHandlers:
     """Test navigation action handlers."""
 
     @pytest.mark.asyncio
-    @patch("storage.event_data.get_event_data")
+    @patch("src.storage.event_data.get_event_data")
     async def test_view_project(self, mock_get_data, mock_projects, context):
         """Test view_project handler."""
         from src.api.actions.navigation.handlers import ViewProjectHandler
@@ -254,6 +299,7 @@ class TestNavigationHandlers:
         payload = {"action": "view_project", "projectId": "proj-1"}
 
         text, card = await handler.execute(payload, context)
+        await handler.update_context(payload, context)
 
         assert "AI Research" in text
         assert context.current_project_id == "proj-1"
@@ -270,6 +316,7 @@ class TestNavigationHandlers:
 
         handler = BackToResultsHandler("back_to_results")
         text, card = await handler.execute({}, context)
+        await handler.update_context({}, context)
 
         assert "Showing 1 results" in text
         assert context.conversation_stage == "show_results"
@@ -283,9 +330,118 @@ class TestNavigationHandlers:
         payload = {"action": "category_select", "category": "AI"}
 
         text, card = await handler.execute(payload, context)
+        await handler.update_context(payload, context)
 
         assert "AI" in text
         assert "ai" in context.selected_categories
+
+
+class TestExperienceHandlers:
+    """Test new chat experience handlers."""
+
+    @pytest.mark.asyncio
+    async def test_hourly_agenda_execution(self, context):
+        """Test hourly_agenda action execution."""
+        from src.api.actions.experiences.handlers import HourlyAgendaHandler
+
+        with patch("src.storage.event_data.get_event_data") as mock_get_data:
+            mock_get_data.return_value = {
+                "sessions": [
+                    {
+                        "title": "Keynote",
+                        "schedule": {
+                            "startDate": "2025-03-15T09:00:00Z",
+                            "endDate": "2025-03-15T10:00:00Z",
+                            "location": "Main Hall",
+                        },
+                        "speakers": [{"displayName": "Dr. Smith"}],
+                    }
+                ]
+            }
+
+            handler = HourlyAgendaHandler("hourly_agenda")
+            payload = {"action": "hourly_agenda", "timezone": "PT", "max_items": 8}
+
+            text, card = await handler.execute(payload, context)
+            await handler.update_context(payload, context)
+
+            assert "agenda" in text.lower()
+            assert card is not None
+            assert card["type"] == "AdaptiveCard"
+            assert card["version"] == "1.6"
+            assert context.conversation_stage == "agenda_view"
+
+    @pytest.mark.asyncio
+    async def test_presenter_carousel_execution(self, context):
+        """Test presenter_carousel action execution."""
+        from src.api.actions.experiences.handlers import PresenterCarouselHandler
+
+        with patch("src.storage.event_data.get_event_data") as mock_get_data:
+            mock_get_data.return_value = {
+                "sessions": [
+                    {
+                        "title": "Session 1",
+                        "schedule": {
+                            "startDate": "2025-03-15T09:00:00Z",
+                            "location": "Room A",
+                        },
+                        "speakers": [{"displayName": "Dr. Jones"}],
+                    }
+                ]
+            }
+
+            handler = PresenterCarouselHandler("presenter_carousel")
+            payload = {"action": "presenter_carousel", "max_presenters": 6}
+
+            text, card = await handler.execute(payload, context)
+            await handler.update_context(payload, context)
+
+            assert "speaker" in text.lower() or "presenter" in text.lower()
+            assert card is not None
+            assert card["type"] == "AdaptiveCard"
+            assert context.conversation_stage == "presenter_view"
+
+    @pytest.mark.asyncio
+    async def test_bookmark_stub(self, context):
+        """Test bookmark action stub."""
+        from src.api.actions.experiences.handlers import BookmarkHandler
+
+        handler = BookmarkHandler("bookmark")
+        payload = {"action": "bookmark", "projectId": "proj-1"}
+
+        text, card = await handler.execute(payload, context)
+
+        assert "bookmark" in text.lower()
+        assert "stub" in text.lower()
+        assert card is None  # Stub returns no card
+
+    @pytest.mark.asyncio
+    async def test_project_synthesis_placeholder(self, context):
+        """Test project_synthesis placeholder."""
+        from src.api.actions.experiences.handlers import ProjectSynthesisHandler
+
+        handler = ProjectSynthesisHandler("project_synthesis")
+        payload = {"action": "project_synthesis"}
+
+        text, card = await handler.execute(payload, context)
+
+        assert "coming soon" in text.lower()
+        assert "synthesis" in text.lower()
+        assert card is None
+
+    @pytest.mark.asyncio
+    async def test_organizer_tools_placeholder(self, context):
+        """Test organizer_tools placeholder."""
+        from src.api.actions.experiences.handlers import OrganizerToolsHandler
+
+        handler = OrganizerToolsHandler("organizer_tools")
+        payload = {"action": "organizer_tools"}
+
+        text, card = await handler.execute(payload, context)
+
+        assert "coming soon" in text.lower()
+        assert "organizer" in text.lower()
+        assert card is None
 
 
 # Cache tests

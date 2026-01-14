@@ -1,0 +1,367 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Event Management",
+          "size": "large",
+          "weight": "bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Organizer Tools & System Status",
+          "size": "medium",
+          "color": "accent",
+          "spacing": "none"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "System Status",
+      "weight": "bolder",
+      "size": "medium",
+      "spacing": "medium"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Component",
+              "weight": "bolder"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Status",
+              "weight": "bolder",
+              "horizontalAlignment": "center"
+            }
+          ]
+        }
+      ],
+      "separator": true,
+      "spacing": "small"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Chat Service"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Project Database"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Session Scheduler"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Analytics Pipeline"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "✓ Operational",
+              "color": "good",
+              "weight": "bolder"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Organizer Tools",
+      "weight": "bolder",
+      "size": "medium",
+      "spacing": "medium",
+      "separator": true
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📊",
+                  "size": "large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "View Attendance Reports",
+                  "weight": "bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Export attendee data and engagement metrics",
+                  "wrap": true,
+                  "size": "small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+          "action": "organizer_tools",
+          "tool": "attendance_report"
+        }
+      },
+      "spacing": "small"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📋",
+                  "size": "large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Manage Submissions",
+                  "weight": "bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Review project status and submission details",
+                  "wrap": true,
+                  "size": "small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+          "action": "organizer_tools",
+          "tool": "manage_submissions"
+        }
+      },
+      "spacing": "small"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "🎥",
+                  "size": "large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Recording Management",
+                  "weight": "bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Update recording status and permissions",
+                  "wrap": true,
+                  "size": "small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+          "action": "organizer_tools",
+          "tool": "recording_management"
+        }
+      },
+      "spacing": "small"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "📧",
+                  "size": "large"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Send Communications",
+                  "weight": "bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Broadcast messages to attendees or presenters",
+                  "wrap": true,
+                  "size": "small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "selectAction": {
+        "type": "Action.Submit",
+        "data": {
+          "action": "organizer_tools",
+          "tool": "communications"
+        }
+      },
+      "spacing": "small"
+    }
+  ]
+}

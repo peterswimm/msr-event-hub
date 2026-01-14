@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as AdaptiveCards from "adaptivecards";
+import ProjectCarousel from "./ProjectCarousel";
 import "./AdaptiveCard.css";
 
 interface AdaptiveCardRendererProps {
@@ -9,6 +10,49 @@ interface AdaptiveCardRendererProps {
 
 const AdaptiveCardRenderer: React.FC<AdaptiveCardRendererProps> = ({ card, onAction }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Check if this is a carousel card
+  const isCarouselCard = card?.body?.some((item: any) => item.type === "Carousel");
+
+  // Extract carousel data if it's a carousel card
+  const getCarouselData = () => {
+    if (!isCarouselCard) return null;
+
+    const carouselElement = card.body.find((item: any) => item.type === "Carousel");
+    const titleElement = card.body.find((item: any) => item.id === "carousel_title");
+    const subtitleElement = card.body.find((item: any) => item.id === "carousel_subtitle");
+
+    const projects = carouselElement?.pages?.map((page: any) => {
+      const nameEl = page.body?.find((b: any) => b.size === "large" && b.weight === "bolder");
+      const areaEl = page.body?.find((b: any) => b.color === "accent");
+      const descEl = page.body?.find((b: any) => b.spacing === "medium" && b.wrap === true && !b.isSubtle);
+      const teamEl = page.body?.find((b: any) => b.isSubtle === true);
+
+      return {
+        name: nameEl?.text || "Untitled",
+        researchArea: areaEl?.text || "",
+        description: descEl?.text || "",
+        team: teamEl?.text ? [{ displayName: teamEl.text.replace("👥 ", "") }] : [],
+      };
+    });
+
+    return {
+      title: titleElement?.text || "Projects",
+      subtitle: subtitleElement?.text || "",
+      projects: projects || [],
+      actions: card.actions || [],
+    };
+  };
+
+  const handleCarouselAction = (actionData: any) => {
+    if (onAction) {
+      // Create a fake SubmitAction for compatibility
+      const fakeAction = {
+        data: actionData,
+      } as any;
+      onAction(fakeAction);
+    }
+  };
 
   useEffect(() => {
     if (!containerRef.current || !card) return;
@@ -22,7 +66,7 @@ const AdaptiveCardRenderer: React.FC<AdaptiveCardRendererProps> = ({ card, onAct
     // Create an AdaptiveCard instance
     const adaptiveCard = new AdaptiveCards.AdaptiveCard();
 
-    // Set host config to inherit parent page styling
+    // Set host config to inherit parent page styling with transparent backgrounds
     adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
       fontFamily: computedStyle.getPropertyValue('font-family') || "Segoe UI, system-ui, sans-serif",
       spacing: {
@@ -35,21 +79,34 @@ const AdaptiveCardRenderer: React.FC<AdaptiveCardRendererProps> = ({ card, onAct
       },
       separator: {
         lineThickness: 1,
-        lineColor: isDark ? "#3F3F3F" : "#EEEEEE"
+        lineColor: isDark ? "#424242" : "#EEEEEE"
       },
       supportsInteractivity: true,
       imageBaseUrl: "",
       containerStyles: {
         default: {
-          backgroundColor: isDark ? "#1F1F1F" : "#FFFFFF",
+          backgroundColor: "transparent",
           foregroundColors: {
             default: {
-              default: isDark ? "#FFFFFF" : "#242424",
+              default: isDark ? "#F5F5F5" : "#242424",
               subtle: isDark ? "#C8C8C8" : "#616161"
             },
             accent: {
-              default: "#0078D4",
-              subtle: "#106EBE"
+              default: "#0F6CBD",
+              subtle: "#115EA3"
+            }
+          }
+        },
+        emphasis: {
+          backgroundColor: isDark ? "#292929" : "#F5F5F5",
+          foregroundColors: {
+            default: {
+              default: isDark ? "#F5F5F5" : "#242424",
+              subtle: isDark ? "#C8C8C8" : "#616161"
+            },
+            accent: {
+              default: "#0F6CBD",
+              subtle: "#115EA3"
             }
           }
         }
@@ -106,6 +163,22 @@ const AdaptiveCardRenderer: React.FC<AdaptiveCardRendererProps> = ({ card, onAct
       containerRef.current.innerHTML = `<div style="color: red; padding: 12px;">Failed to render card: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
     }
   }, [card, onAction]);
+
+  // If it's a carousel card, render our custom component
+  if (isCarouselCard) {
+    const carouselData = getCarouselData();
+    if (carouselData) {
+      return (
+        <ProjectCarousel
+          title={carouselData.title}
+          subtitle={carouselData.subtitle}
+          projects={carouselData.projects}
+          actions={carouselData.actions}
+          onAction={handleCarouselAction}
+        />
+      );
+    }
+  }
 
   return (
     <div 

@@ -1,6 +1,21 @@
-import { Button, Link, Text } from "@fluentui/react-components";
+import { Button, Link, makeStyles, tokens, shorthands } from "@fluentui/react-components";
 import { PersonFeedback16Regular } from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
+
+const useStyles = makeStyles({
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    ...shorthands.padding(tokens.spacingVerticalM, tokens.spacingHorizontalL),
+    ...shorthands.gap(tokens.spacingHorizontalM),
+    backgroundColor: "transparent",
+  },
+  actions: {
+    display: "flex",
+    ...shorthands.gap(tokens.spacingHorizontalS),
+  },
+});
 
 type BrandHeaderProps = {
   title: string;
@@ -10,6 +25,7 @@ type BrandHeaderProps = {
 };
 
 const BrandHeader = ({ title, feedbackUrl, onStop, isStreaming }: BrandHeaderProps) => {
+  const styles = useStyles();
   const [isSmall, setIsSmall] = useState(window.innerWidth < 600);
 
   useEffect(() => {
@@ -19,19 +35,8 @@ const BrandHeader = ({ title, feedbackUrl, onStop, isStreaming }: BrandHeaderPro
   }, []);
 
   return (
-    <div className="brand-header">
-      <div className="brand-left">
-        <div className="microsoft-logo">
-          <div className="logo-square logo-red"></div>
-          <div className="logo-square logo-green"></div>
-          <div className="logo-square logo-blue"></div>
-          <div className="logo-square logo-yellow"></div>
-        </div>
-        <span className="microsoft-text">Microsoft</span>
-        <span className="brand-divider">|</span>
-        <Link href="/">{title}</Link>
-      </div>
-      <div className="brand-actions">
+    <div className={styles.header}>
+      <div className={styles.actions}>
         {isStreaming ? (
           <Button appearance="secondary" onClick={onStop}>
             Stop

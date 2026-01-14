@@ -1,0 +1,186 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "fallbackText": "Welcome to India MSR. Discover cutting-edge research projects and connect with Microsoft Research teams.",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "WELCOME TO INDIA MSR",
+          "size": "extraLarge",
+          "weight": "bolder",
+          "wrap": true,
+          "spacing": "none"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          "wrap": true,
+          "spacing": "small",
+          "size": "small"
+        }
+      ],
+      "spacing": "none"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Quick Actions",
+      "weight": "bolder",
+      "size": "medium",
+      "spacing": "medium",
+      "separator": true
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "browse_all",
+                  "intent": "project_search"
+                }
+              },
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Browse Projects",
+                  "weight": "bolder",
+                  "wrap": true,
+                  "spacing": "none"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Explore all research projects",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small"
+                }
+              ],
+              "minHeight": 100
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "category_select",
+                  "intent": "category_browse"
+                }
+              },
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Admin Tools",
+                  "weight": "bolder",
+                  "wrap": true,
+                  "spacing": "none"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "System status & organizer tools",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small"
+                }
+              ],
+              "minHeight": 100
+            }
+          ]
+        }
+      ],
+      "spacing": "medium"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "researcher_search",
+                  "intent": "people_lookup"
+                }
+              },
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Find Researcher",
+                  "weight": "bolder",
+                  "wrap": true,
+                  "spacing": "none"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Search by name or team",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small"
+                }
+              ],
+              "minHeight": 100
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "hourly_agenda",
+                  "intent": "session_schedule"
+                }
+              },
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Today's Schedule",
+                  "weight": "bolder",
+                  "wrap": true,
+                  "spacing": "none"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "View sessions and agenda",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small"
+                }
+              ],
+              "minHeight": 100
+            }
+          ]
+        }
+      ],
+      "spacing": "medium"
+    }
+  ]
+}

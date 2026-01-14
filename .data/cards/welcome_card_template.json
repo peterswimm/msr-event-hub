@@ -2,69 +2,194 @@
   "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
   "version": "1.5",
-  "id": "welcome_card",
-  "fallbackText": "Welcome to MSR Event Hub Chat! I can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
+  "fallbackText": "Welcome to MSR Event Hub - Project Green 2026. Discover cutting-edge research projects and connect with Microsoft Research teams.",
   "body": [
     {
-      "type": "TextBlock",
-      "id": "welcome_title",
-      "text": "Welcome to MSR Event Hub Chat!",
-      "size": "large",
-      "weight": "bolder",
-      "color": "accent",
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Project Green 2026",
+          "size": "large",
+          "weight": "bolder",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "MSR Event Hub",
+          "size": "medium",
+          "weight": "bolder",
+          "color": "accent",
+          "spacing": "none"
+        }
+      ],
       "spacing": "none"
     },
     {
       "type": "TextBlock",
-      "id": "welcome_subtitle",
-      "text": "I can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
+      "text": "Welcome! I can help you explore research projects, find sessions, and connect with researchers at the Redmond Research Showcase.",
       "wrap": true,
-      "spacing": "small"
+      "spacing": "medium"
     },
     {
       "type": "TextBlock",
-      "id": "welcome_question",
-      "text": "What would you like to do?",
+      "text": "Quick Actions",
       "weight": "bolder",
+      "size": "medium",
       "spacing": "medium"
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "id": "action_browse",
-      "title": "Browse All Projects",
-      "data": {
-        "action": "browse_all",
-        "intent": "project_search"
-      }
     },
     {
-      "type": "Action.Submit",
-      "id": "action_category",
-      "title": "Filter by Category",
-      "data": {
-        "action": "category_select",
-        "intent": "category_browse"
-      }
+      "type": "ColumnSet",
+      "spacing": "small",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Browse Projects",
+                  "weight": "bolder",
+                  "size": "medium",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Explore all research projects",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small",
+                  "horizontalAlignment": "center"
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "browse_all",
+                  "intent": "project_search"
+                }
+              },
+              "minHeight": "100px"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Admin Tools",
+                  "weight": "bolder",
+                  "size": "medium",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "System status & organizer tools",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small",
+                  "horizontalAlignment": "center"
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "organizer_tools",
+                  "intent": "admin_dashboard"
+                }
+              },
+              "minHeight": "100px"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Action.Submit",
-      "id": "action_researcher",
-      "title": "Find by Researcher",
-      "data": {
-        "action": "researcher_search",
-        "intent": "people_lookup"
-      }
-    },
-    {
-      "type": "Action.Submit",
-      "id": "action_recording",
-      "title": "Recording Status",
-      "data": {
-        "action": "recording_filter",
-        "intent": "recording_status"
-      }
+      "type": "ColumnSet",
+      "spacing": "small",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Find Researcher",
+                  "weight": "bolder",
+                  "size": "medium",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Search by name or team",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small",
+                  "horizontalAlignment": "center"
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "researcher_search",
+                  "intent": "people_lookup"
+                }
+              },
+              "minHeight": "100px"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "Container",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Today's Schedule",
+                  "weight": "bolder",
+                  "size": "medium",
+                  "horizontalAlignment": "center"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "View sessions and agenda",
+                  "wrap": true,
+                  "size": "small",
+                  "spacing": "small",
+                  "horizontalAlignment": "center"
+                }
+              ],
+              "selectAction": {
+                "type": "Action.Submit",
+                "data": {
+                  "action": "hourly_agenda",
+                  "intent": "session_schedule"
+                }
+              },
+              "minHeight": "100px"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -1,17 +1,15 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
-  Button,
   Spinner,
-  Subtitle2,
   Text,
-  Title2,
   Tooltip
 } from "@fluentui/react-components";
-import { Dismiss24Regular, ShieldError24Regular } from "@fluentui/react-icons";
+import { ShieldError24Regular } from "@fluentui/react-icons";
 import ChatLayout from "./components/ChatLayout";
 import MessageInput from "./components/MessageInput";
 import MessageList from "./components/MessageList";
 import BrandHeader from "./components/BrandHeader";
+import HamburgerMenu from "./components/HamburgerMenu";
 import HeroCards from "./components/HeroCards";
 import Footer from "./components/Footer";
 import { streamChatCompletion } from "./clients/azureOpenAI";
@@ -47,7 +45,8 @@ function App() {
             id: "welcome",
             role: "assistant",
             content: `${data.message}\n\n${data.description}`,
-            adaptive_card: data.adaptive_card // Include the adaptive card
+            adaptive_card: data.adaptive_card, // Include the adaptive card
+            isWelcomeCard: true // Mark this as the welcome card for filtering
           }]);
           console.log("Messages set with welcome card:", data.adaptive_card ? "has card" : "no card");
           setExamplePrompts(data.examples || []);
@@ -58,7 +57,8 @@ function App() {
         setMessages([{
           id: "welcome",
           role: "assistant",
-          content: "Welcome to MSR Event Hub Chat! 🎓\n\nI can help you explore research projects, find sessions, and learn about the Redmond Research Showcase."
+          content: "Welcome to MSR Event Hub Chat! 🎓\n\nI can help you explore research projects, find sessions, and learn about the Redmond Research Showcase.",
+          isWelcomeCard: true // Mark this as the welcome card for filtering
         }]);
       }
     };
@@ -269,9 +269,20 @@ function App() {
           }
           
           setMessages((prev: ChatMessage[]) => {
-            const next = prev.filter((m: ChatMessage) => m.id !== assistantId);
+            // Remove the assistant message being updated and welcome card messages
+            const filtered = prev.filter((m: ChatMessage) => {
+              // Keep if it's not the current assistant message
+              if (m.id !== assistantId) {
+                // Remove the welcome card when a new response comes in
+                if ((m as any).isWelcomeCard) {
+                  return false;
+                }
+                return true;
+              }
+              return false;
+            });
             return [
-              ...next,
+              ...filtered,
               {
                 id: assistantId,
                 role: "assistant",
@@ -297,9 +308,19 @@ function App() {
     }
   }, [handleSend, config.hubApiBase, config.endpoint, config.deployment, config.apiVersion, config.apiKey, messages, prefersHubProxy, canStreamDirect, systemPrompt]);
 
+  const handleMenuAction = useCallback((action: string) => {
+    // Trigger card action from menu
+    handleCardAction({ action });
+  }, [handleCardAction]);
+
   return (
     <ChatLayout
-      header={<BrandHeader title={config.siteTitle!} feedbackUrl={import.meta.env.VITE_FEEDBACK_URL as string | undefined} onStop={handleStop} isStreaming={isStreaming} />}
+      header={
+        <>
+          <HamburgerMenu onMenuItemClick={handleMenuAction} />
+          <BrandHeader title={config.siteTitle!} feedbackUrl={import.meta.env.VITE_FEEDBACK_URL as string | undefined} onStop={handleStop} isStreaming={isStreaming} />
+        </>
+      }
       footer={<Footer />}
     >
       {!prefersHubProxy && !canStreamDirect ? (

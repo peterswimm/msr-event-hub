@@ -1,0 +1,29 @@
+{
+  "name": "msr-event-agent-chat",
+  "version": "1.0.0",
+  "description": "MSR Event Agent Chat - Unified monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/types",
+    "web/chat"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:types": "npm --workspace @msr/types run build",
+    "build:webchat": "npm --workspace @msr/webchat run build",
+    "dev": "npm run dev --workspace @msr/webchat",
+    "dev:types": "npm --workspace @msr/types run build -- --watch",
+    "type-check": "npm run type-check --workspaces",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf web/*/node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

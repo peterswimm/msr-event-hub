@@ -4,7 +4,17 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles.css";
-import { applyGlobalStyles } from "./GlobalStyles";
+import { useGlobalStyles } from "./GlobalStyles";
+
+// Initialize axe-core for accessibility testing in development
+if (import.meta.env.DEV && import.meta.env.VITE_A11Y === 'true') {
+  import('@axe-core/react').then(axe => {
+    axe.default(React, ReactDOM, 1000, {});
+    console.log('🔍 Axe-core accessibility testing enabled');
+  }).catch(err => {
+    console.warn('Failed to load axe-core:', err);
+  });
+}
 
 const queryClient = new QueryClient();
 
@@ -18,13 +28,17 @@ if (themeName === "webDark") {
   document.documentElement.classList.remove("dark");
 }
 
-applyGlobalStyles();
+// Wrapper component to apply global styles inside React context
+function AppWithStyles() {
+  useGlobalStyles();
+  return <App />;
+}
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <FluentProvider theme={theme} style={{ height: "100%" }}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <AppWithStyles />
       </QueryClientProvider>
     </FluentProvider>
   </React.StrictMode>

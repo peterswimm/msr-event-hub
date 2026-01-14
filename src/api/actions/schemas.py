@@ -193,6 +193,62 @@ class CategorySelectPayload(NavigationPayload):
     category: Optional[str] = Field(None, min_length=1, description="Category name")
 
 
+class ExperiencePayload(ActionPayload):
+    """Base schema for experience actions."""
+
+    action: str = Field(..., description="Experience action type")
+
+    @field_validator("action")
+    def validate_experience_action(cls, v):
+        valid_experiences = [
+            "hourly_agenda",
+            "presenter_carousel",
+            "bookmark",
+            "project_synthesis",
+            "organizer_tools",
+        ]
+        if v not in valid_experiences:
+            raise ValueError(f"action must be one of {valid_experiences}")
+        return v
+
+
+class HourlyAgendaPayload(ExperiencePayload):
+    """Schema for hourly_agenda action."""
+
+    action: str = Field("hourly_agenda")
+    timezone: str = Field("PT", description="Timezone label for display")
+    max_items: int = Field(8, ge=1, le=20, description="Max sessions to show")
+
+
+class PresenterCarouselPayload(ExperiencePayload):
+    """Schema for presenter_carousel action."""
+
+    action: str = Field("presenter_carousel")
+    max_presenters: int = Field(6, ge=1, le=12, description="Max presenters to show")
+
+
+class BookmarkPayload(ExperiencePayload):
+    """Schema for bookmark action."""
+
+    action: str = Field("bookmark")
+    type: Optional[str] = Field(None, description="Item type (project, session, presenter)")
+    projectId: Optional[str] = None
+    sessionId: Optional[str] = None
+    presenter: Optional[str] = None
+
+
+class ProjectSynthesisPayload(ExperiencePayload):
+    """Schema for project_synthesis action."""
+
+    action: str = Field("project_synthesis")
+
+
+class OrganizerToolsPayload(ExperiencePayload):
+    """Schema for organizer_tools action."""
+
+    action: str = Field("organizer_tools")
+
+
 # Payload type mapping for dynamic validation
 PAYLOAD_SCHEMAS = {
     "browse_all": BrowseAllPayload,
@@ -210,6 +266,11 @@ PAYLOAD_SCHEMAS = {
     "back_to_results": BackToResultsPayload,
     "find_similar": FindSimilarPayload,
     "category_select": CategorySelectPayload,
+    "hourly_agenda": HourlyAgendaPayload,
+    "presenter_carousel": PresenterCarouselPayload,
+    "bookmark": BookmarkPayload,
+    "project_synthesis": ProjectSynthesisPayload,
+    "organizer_tools": OrganizerToolsPayload,
 }
 
 

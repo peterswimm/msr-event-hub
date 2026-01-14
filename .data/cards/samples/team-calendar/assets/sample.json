@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-adaptivecards-samples-team-calendar",
+    "source": "pnp",
+    "title": "Team Calendar Adaptive Card Design",
+    "shortDescription": "Design for showing calendar format and upcoming team events.",
+    "url": "https://github.com/pnp/AdaptiveCards-Templates/tree/main/samples/team-calendar",
+    "longDescription": [
+      "Design for showing calendar format and upcoming team events."
+    ],
+    "creationDateTime": "2021-12-28",
+    "updateDateTime": "2021-12-28",
+    "products": [
+      "Viva"
+    ],
+    "metadata": [
+    ],
+"tags": [],
+    "categories": [
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/AdaptiveCards-Templates/main/samples/team-calendar/assets/card.png",
+        "alt": "Preview"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "VesaJuvonen",
+        "company": "Microsoft",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/7446437?v=4",
+        "name": "Vesa Juvonen"
+      }
+    ],
+    "references": [
+      {
+        "name": "Overview of Viva Connections Extensibility",
+        "description": "Building extensibility for the Microsoft Viva Connections.",
+        "url": "https://docs.microsoft.com/en-us/sharepoint/dev/spfx/viva/overview-viva-connections?WT.mc_id=m365-15741-cxa"
+      },
+      {
+        "name": "Designing Viva Connections custom cards for your dashboard",
+        "description": "Design guidance for the Viva Cards.",
+        "url": "https://docs.microsoft.com/en-us/sharepoint/dev/spfx/viva/design/designing-card?WT.mc_id=m365-15741-cxa"
+      }
+    ]
+  }
+]

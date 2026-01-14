@@ -31,7 +31,7 @@
       "items": [
         {
           "type": "TextBlock",
-          "text": "👥 Team",
+          "text": "Team",
           "weight": "bolder",
           "spacing": "small"
         },
@@ -50,7 +50,7 @@
       "items": [
         {
           "type": "TextBlock",
-          "text": "📋 Project Details",
+          "text": "Project Details",
           "weight": "bolder",
           "spacing": "small"
         },
@@ -62,7 +62,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "📍 Placement:",
+                  "text": "Placement:",
                   "weight": "bolder",
                   "size": "small"
                 }
@@ -89,7 +89,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "🎛️ Equipment:",
+                  "text": "Equipment:",
                   "weight": "bolder",
                   "size": "small"
                 }
@@ -116,7 +116,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "📹 Recording:",
+                  "text": "Recording:",
                   "weight": "bolder",
                   "size": "small"
                 }
@@ -143,7 +143,7 @@
               "items": [
                 {
                   "type": "TextBlock",
-                  "text": "🎯 Audience:",
+                  "text": "Audience:",
                   "weight": "bolder",
                   "size": "small"
                 }
@@ -169,7 +169,7 @@
   "actions": [
     {
       "type": "Action.Submit",
-      "title": "👈 Back to Results",
+      "title": "Back to Results",
       "data": {
         "action": "back_to_results",
         "projectId": "${projectId}"
@@ -177,7 +177,7 @@
     },
     {
       "type": "Action.Submit",
-      "title": "🔍 Similar Projects",
+      "title": "Similar Projects",
       "data": {
         "action": "find_similar",
         "projectId": "${projectId}",

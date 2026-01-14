@@ -186,18 +186,68 @@ def create_app(storage_root: Optional[Path] = None) -> Optional[FastAPI]:
         """API root endpoint with basic info."""
         return {
             "service": "Knowledge Agent API",
-            "version": "0.2.0",
-            "phase": "B (Event-scoped, Graph-aligned)",
+            "version": "0.3.0",
+            "phase": "C (Data Layer & Frontend Separation)",
             "endpoints": {
                 "health": "/health",
                 "docs": "/docs",
-                "events": "/v1/events",
-                "projects": "/v1/events/{eventId}/projects",
-                "knowledge": "/v1/events/{eventId}/projects/{projectId}/knowledge"
+                "v1_events": "/v1/events",
+                "v1_projects": "/v1/events/{eventId}/projects",
+                "v1_knowledge": "/v1/events/{eventId}/projects/{projectId}/knowledge",
+                "data_events": "/data/events",
+                "data_projects": "/data/projects",
+                "data_sessions": "/data/sessions",
+                "data_artifacts": "/data/artifacts"
+            },
+            "phases": {
+                "phase_1": "Bridge TypeScript fixes (complete)",
+                "phase_2": "Webchat atomic component (complete)",
+                "phase_3": "Data layer pure CRUD endpoints (in progress)",
+                "phase_4": "Frontend deployment & CORS (planned)"
             }
         }
     
     # ===== Register Routers =====
+    
+    # Import data routers for Phase 3 pure CRUD endpoints
+    try:
+        from src.api.data import (
+            get_data_events_router,
+            get_data_projects_router,
+            get_data_sessions_router,
+            get_data_artifacts_router
+        )
+    except ImportError:
+        logger.warning("Data routers not available - Phase 3 not fully initialized")
+        get_data_events_router = None
+        get_data_projects_router = None
+        get_data_sessions_router = None
+        get_data_artifacts_router = None
+    
+    # Data layer routers (/data/* endpoints - Phase 3)
+    if get_data_events_router:
+        data_events_router = get_data_events_router(repo=ctx.event_repo)
+        if data_events_router:
+            app.include_router(data_events_router)
+            logger.info("✓ Data events router registered at /data/events")
+    
+    if get_data_projects_router:
+        data_projects_router = get_data_projects_router(repo=ctx.project_repo)
+        if data_projects_router:
+            app.include_router(data_projects_router)
+            logger.info("✓ Data projects router registered at /data/projects")
+    
+    if get_data_sessions_router:
+        data_sessions_router = get_data_sessions_router(repo=ctx.session_repo)
+        if data_sessions_router:
+            app.include_router(data_sessions_router)
+            logger.info("✓ Data sessions router registered at /data/sessions")
+    
+    if get_data_artifacts_router:
+        data_artifacts_router = get_data_artifacts_router(repo=ctx.artifact_repo)
+        if data_artifacts_router:
+            app.include_router(data_artifacts_router)
+            logger.info("✓ Data artifacts router registered at /data/artifacts")
     
     # Event & Session routes
     events_router = get_events_router(repo=ctx.event_repo)
