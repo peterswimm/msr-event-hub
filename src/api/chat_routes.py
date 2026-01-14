@@ -235,6 +235,10 @@ def get_chat_router():
                         action_type, card_action, context
                     )
 
+                    logger.info(f"Card action result: text='{result_text}', card={result_card is not None}")
+                    if result_card:
+                        logger.debug(f"Card keys: {list(result_card.keys())}, size: {len(json.dumps(result_card))} bytes")
+
                     async def action_response_stream():
                         payload_data = {
                             "delta": result_text,
@@ -243,7 +247,16 @@ def get_chat_router():
                             payload_data["adaptive_card"] = result_card
                         payload_data["context"] = context.to_dict()
 
-                        yield f"data: {json.dumps(payload_data)}\n\n"
+                        logger.info(f"Streaming payload keys: {list(payload_data.keys())}, has adaptive_card: {'adaptive_card' in payload_data}")
+                        
+                        # Log the size of what we're sending
+                        json_str = json.dumps(payload_data)
+                        logger.info(f"Payload JSON size: {len(json_str)} bytes")
+                        
+                        # Log first 500 chars for debugging
+                        logger.debug(f"Payload preview: {json_str[:500]}...")
+                        
+                        yield f"data: {json_str}\n\n"
                         yield "data: [DONE]\n\n"
 
                     return StreamingResponse(

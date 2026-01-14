@@ -61,38 +61,40 @@ $frontendDist = Join-Path $projectRoot "web\chat\dist"
 $frontendPackageJson = Join-Path $projectRoot "web\chat\package.json"
 
 if (Test-Path $frontendPackageJson) {
-    if (-not (Test-Path $frontendDist)) {
-        Write-Host "Frontend not built. Building..." -ForegroundColor Yellow
-        
-        Push-Location (Join-Path $projectRoot "web\chat")
-        try {
-            # Install dependencies if node_modules missing
-            if (-not (Test-Path "node_modules")) {
-                Write-Host "Installing frontend dependencies..." -ForegroundColor Yellow
-                npm install
-                if ($LASTEXITCODE -ne 0) {
-                    Write-Host "ERROR: npm install failed" -ForegroundColor Red
-                    Pop-Location
-                    exit 1
-                }
-            }
-            
-            # Build frontend
-            Write-Host "Building frontend..." -ForegroundColor Yellow
-            npm run build
+    Write-Host "Building frontend (fresh build)..." -ForegroundColor Yellow
+    
+    Push-Location (Join-Path $projectRoot "web\chat")
+    try {
+        # Install dependencies if node_modules missing
+        if (-not (Test-Path "node_modules")) {
+            Write-Host "Installing frontend dependencies..." -ForegroundColor Yellow
+            npm install
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "ERROR: Frontend build failed" -ForegroundColor Red
+                Write-Host "ERROR: npm install failed" -ForegroundColor Red
                 Pop-Location
                 exit 1
             }
-            
-            Write-Host "✓ Frontend built successfully" -ForegroundColor Green
         }
-        finally {
+        
+        # Clean build (remove dist)
+        if (Test-Path "dist") {
+            Write-Host "Cleaning old build..." -ForegroundColor Yellow
+            Remove-Item -r "dist" -Force -ErrorAction SilentlyContinue
+        }
+        
+        # Build frontend
+        Write-Host "Building frontend..." -ForegroundColor Yellow
+        npm run build
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERROR: Frontend build failed" -ForegroundColor Red
             Pop-Location
+            exit 1
         }
-    } else {
-        Write-Host "✓ Frontend already built" -ForegroundColor Green
+        
+        Write-Host "✓ Frontend built successfully" -ForegroundColor Green
+    }
+    finally {
+        Pop-Location
     }
 } else {
     Write-Host "⚠ Frontend package.json not found, skipping build" -ForegroundColor Yellow
@@ -117,5 +119,10 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "ERROR: Server failed to start" -ForegroundColor Red
     Write-Host "Check logs above for details" -ForegroundColor Yellow
-    exit 1
 }
+
+# Return to scripts folder when server shuts down
+Write-Host ""
+Write-Host "Server stopped. Returning to scripts folder..." -ForegroundColor Cyan
+Set-Location (Join-Path $projectRoot "scripts")
+Write-Host "✓ Ready for next commands" -ForegroundColor Green

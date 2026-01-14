@@ -77,6 +77,26 @@ def apply_filter(
     return [p for p in projects if filter_func(p)]
 
 
+def safe_text(value: Any, default: str = " ") -> str:
+    """
+    Safely convert a value to text, ensuring non-empty strings.
+    
+    Adaptive Cards require all text fields to be non-empty strings.
+    Returns a space if the value is None, empty, or False.
+    
+    Args:
+        value: Value to convert
+        default: Default value if empty (default is a space)
+        
+    Returns:
+        Non-empty string
+    """
+    if not value:
+        return default
+    text = str(value).strip()
+    return text if text else default
+
+
 def safe_truncate(text: str, max_length: int = 120) -> str:
     """
     Safely truncate text at word boundary.
@@ -128,23 +148,27 @@ def build_project_carousel(
     # Build project items
     project_items = []
     for idx, proj in enumerate(displayed):
-        team = ", ".join(
+        team = safe_text(", ".join(
             [
                 m.get("displayName", m.get("name", ""))
                 for m in proj.get("team", [])
             ]
-        )
-        desc = safe_truncate(proj.get("description", ""), 120)
+        ), "No team info")
+        desc = safe_text(safe_truncate(proj.get("description", ""), 120), "Description unavailable")
+        name = safe_text(proj.get("name", ""), "Untitled Project")
+        area = safe_text(proj.get("researchArea", ""), "General")
 
         project_items.append(
             {
                 "type": "Container",
+                "id": f"project_{idx}",
                 "separator": idx > 0,
                 "spacing": "medium",
                 "items": [
                     {
                         "type": "TextBlock",
-                        "text": proj.get("name", "Untitled"),
+                        "id": f"project_{idx}_name",
+                        "text": name,
                         "size": "medium",
                         "weight": "bolder",
                         "wrap": True,
@@ -152,18 +176,21 @@ def build_project_carousel(
                     },
                     {
                         "type": "TextBlock",
-                        "text": proj.get("researchArea", "General"),
+                        "id": f"project_{idx}_area",
+                        "text": area,
                         "size": "small",
                         "color": "accent",
                     },
                     {
                         "type": "TextBlock",
+                        "id": f"project_{idx}_desc",
                         "text": desc,
                         "wrap": True,
                         "spacing": "small",
                     },
                     {
                         "type": "TextBlock",
+                        "id": f"project_{idx}_team",
                         "text": f"👥 {team}",
                         "size": "small",
                         "spacing": "small",
@@ -202,19 +229,30 @@ def build_project_carousel(
         "type": "AdaptiveCard",
         "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
         "version": "1.5",
+        "id": "carousel_card",
         "fallbackText": f"{title} - {len(displayed)} projects",
         "body": [
             {
                 "type": "TextBlock",
-                "text": title,
+                "id": "carousel_title",
+                "text": safe_text(title, "Projects"),
                 "size": "large",
                 "weight": "bolder",
                 "spacing": "none",
             },
-            {"type": "TextBlock", "text": subtitle, "size": "small", "color": "accent"},
+            {
+                "type": "TextBlock",
+                "id": "carousel_subtitle",
+                "text": safe_text(subtitle, f"Showing {len(displayed)} project{'s' if len(displayed) != 1 else ''}"),
+                "size": "small",
+                "color": "accent"
+            },
         ]
         + project_items,
-        "actions": actions,
+        "actions": [
+            {**action, "id": f"action_{idx}"} 
+            for idx, action in enumerate(actions)
+        ],
     }
 
 
@@ -234,19 +272,21 @@ def build_error_card(
     body = [
         {
             "type": "TextBlock",
+            "id": "error_title",
             "text": "⚠️ Something went wrong",
             "size": "large",
             "weight": "bolder",
             "color": "attention",
         },
-        {"type": "TextBlock", "text": error_message, "wrap": True},
+        {"type": "TextBlock", "id": "error_message", "text": safe_text(error_message, "An error occurred"), "wrap": True},
     ]
 
     if action:
         body.append(
             {
                 "type": "TextBlock",
-                "text": f"Action: {action}",
+                "id": "error_action",
+                "text": safe_text(f"Action: {action}", " "),
                 "size": "small",
                 "isSubtle": True,
             }
@@ -256,11 +296,13 @@ def build_error_card(
         "type": "AdaptiveCard",
         "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
         "version": "1.5",
+        "id": "error_card",
         "fallbackText": f"Error: {error_message}",
         "body": body,
         "actions": [
             {
                 "type": "Action.Submit",
+                "id": "action_try_again",
                 "title": "Try Again",
                 "data": {"action": "browse_all"},
             },

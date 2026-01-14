@@ -107,6 +107,7 @@ function App() {
 
   const handleSend = useCallback(
     async (text: string) => {
+      console.log("[App.handleSend] Called with text:", text.substring(0, 50));
       if (!text.trim()) return;
       if (!prefersHubProxy && !canStreamDirect) {
         setError("No chat backend configured. Set VITE_CHAT_API_BASE or Azure OpenAI env vars.");
@@ -232,6 +233,7 @@ function App() {
       let assistantCard: any = null;
       
       try {
+        console.log("[App] prefersHubProxy:", prefersHubProxy, "config.hubApiBase:", config?.hubApiBase);
         const stream = prefersHubProxy
           ? streamHubChat({
               baseUrl: config.hubApiBase!,
@@ -251,10 +253,18 @@ function App() {
           const delta = typeof chunk === "string" ? chunk : chunk?.delta || "";
           const adaptiveCard = typeof chunk === "object" ? chunk?.adaptive_card : null;
           
+          console.log("[handleCardAction stream]", {
+            chunkType: typeof chunk,
+            deltaLength: delta.length,
+            hasAdaptiveCard: Boolean(adaptiveCard),
+            chunkKeys: typeof chunk === "object" ? Object.keys(chunk) : "N/A"
+          });
+          
           if (delta) {
             assistantContent += delta;
           }
           if (adaptiveCard && !assistantCard) {
+            console.log("[handleCardAction] Setting assistantCard");
             assistantCard = adaptiveCard;
           }
           
