@@ -17,8 +17,12 @@ export function initializeAnalytics(): void {
     return;
   }
 
-  const instrumentationKey = import.meta.env.VITE_ANALYTICS_KEY || 
-    'aa725b41beb74355a0aac6c77857f438-53965fd3-b9d8-45b6-9196-b00bcfa4a001-6890';
+  const instrumentationKey = import.meta.env.VITE_ANALYTICS_KEY;
+  
+  if (!instrumentationKey) {
+    console.warn('[Analytics] No instrumentation key provided. Set VITE_ANALYTICS_KEY environment variable.');
+    return;
+  }
 
   analytics = new window.oneDS.ApplicationInsights();
   
