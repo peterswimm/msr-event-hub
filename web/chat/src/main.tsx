@@ -5,6 +5,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles.css";
 import { useGlobalStyles } from "./GlobalStyles";
+import { initializeAnalytics } from "./analytics";
+
+// Initialize 1DS Web Analytics
+initializeAnalytics();
 
 // Initialize axe-core for accessibility testing in development
 if (import.meta.env.DEV && import.meta.env.VITE_A11Y === 'true') {
