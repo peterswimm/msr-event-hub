@@ -1,0 +1,39 @@
+{
+  "@odata.type": "#microsoft.graph.project",
+  "@odata.etag": "W/\"proj002\"",
+  "id": "proj-efficient-training",
+  "eventId": "msri-tab-2026",
+  "name": "Efficient Training Framework for Large Language Models",
+  "description": "Distributed training optimizations reducing GPU hours by 40% through novel gradient compression and model parallelism techniques",
+  "researchArea": "Systems & Networking",
+  "posterUrl": "https://example.com/posters/efficient-training.pdf",
+  "imageUrl": "https://example.com/images/efficient-training.jpg",
+  "location": "Booth 15",
+  "theme": "Performance & Scale",
+  "team": [
+    {
+      "name": "Rajesh Kumar",
+      "email": "rajesh.kumar@microsoft.com",
+      "title": "Senior Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Lead"
+    },
+    {
+      "name": "Sanjay Patel",
+      "email": "sanjay.patel@microsoft.com",
+      "title": "Research Engineer",
+      "affiliation": "Microsoft Research India",
+      "role": "Contributor"
+    }
+  ],
+  "contactEmail": "rajesh.kumar@microsoft.com",
+  "videos": [],
+  "slides": ["https://example.com/slides/distributed-ml.pdf"],
+  "papers": [],
+  "codeRepos": ["https://github.com/microsoft/distributed-ml-infra"],
+  "otherLinks": [],
+  "keywords": ["distributed training", "GPU optimization", "model parallelism", "LLM"],
+  "maturitySignal": "validated",
+  "createdAt": "2026-01-10T00:00:00Z",
+  "updatedAt": "2026-01-15T11:00:00Z"
+}

@@ -1,0 +1,31 @@
+{
+  "@odata.type": "#microsoft.graph.session",
+  "@odata.etag": "W/\"sess003\"",
+  "id": "sess-hci-accessibility",
+  "eventId": "msri-tab-2026",
+  "title": "AI-Powered Accessibility Tools for Visual Impairments",
+  "sessionType": "talk",
+  "description": "Real-time scene understanding and navigation assistance using multimodal AI for users with low vision",
+  "startDateTime": "2026-01-24T14:00:00+05:30",
+  "endDateTime": "2026-01-24T14:45:00+05:30",
+  "location": "Room B-105",
+  "track": "Human-Computer Interaction",
+  "speakers": [
+    {
+      "name": "Ananya Desai",
+      "email": "ananya.desai@microsoft.com",
+      "title": "Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Speaker"
+    }
+  ],
+  "slideDeck": [],
+  "recording": null,
+  "relatedPosters": ["proj-vision-assist"],
+  "relatedPapers": ["https://arxiv.org/abs/2024.54321"],
+  "codeRepos": [],
+  "otherLinks": ["https://aka.ms/vision-assist-demo"],
+  "keywords": ["accessibility", "computer vision", "assistive technology", "HCI"],
+  "createdAt": "2026-01-12T00:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}

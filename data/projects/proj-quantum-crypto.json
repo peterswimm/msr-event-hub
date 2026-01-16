@@ -1,0 +1,32 @@
+{
+  "@odata.type": "#microsoft.graph.project",
+  "@odata.etag": "W/\"proj004\"",
+  "id": "proj-quantum-crypto",
+  "eventId": "msri-tab-2026",
+  "name": "Post-Quantum Cryptography for Cloud Services",
+  "description": "Implementation and benchmarking of lattice-based cryptographic algorithms resistant to quantum attacks",
+  "researchArea": "Theory & Algorithms",
+  "posterUrl": "https://example.com/posters/quantum-crypto.pdf",
+  "imageUrl": "https://example.com/images/quantum-crypto.jpg",
+  "location": "Booth 7",
+  "theme": "Security & Privacy",
+  "team": [
+    {
+      "name": "Meera Iyer",
+      "email": "meera.iyer@microsoft.com",
+      "title": "Senior Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Lead"
+    }
+  ],
+  "contactEmail": "meera.iyer@microsoft.com",
+  "videos": [],
+  "slides": ["https://example.com/slides/quantum-crypto.pdf"],
+  "papers": [],
+  "codeRepos": ["https://github.com/microsoft/pq-crypto"],
+  "otherLinks": [],
+  "keywords": ["cryptography", "quantum computing", "security", "lattice-based"],
+  "maturitySignal": "validated",
+  "createdAt": "2026-01-10T00:00:00Z",
+  "updatedAt": "2026-01-15T11:00:00Z"
+}

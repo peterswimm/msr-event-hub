@@ -1,0 +1,32 @@
+{
+  "@odata.type": "#microsoft.graph.session",
+  "@odata.etag": "W/\"sess001\"",
+  "id": "sess-ai-agents-foundations",
+  "eventId": "msri-tab-2026",
+  "title": "Foundation Models for Agentic Systems",
+  "sessionType": "keynote",
+  "description": "Exploring how large language models enable autonomous agents to reason, plan, and execute complex tasks across domains",
+  "startDateTime": "2026-01-24T09:30:00+05:30",
+  "endDateTime": "2026-01-24T10:30:00+05:30",
+  "location": "Main Auditorium",
+  "track": "Artificial Intelligence",
+  "speakers": [
+    {
+      "name": "Dr. Priya Sharma",
+      "email": "priya.sharma@microsoft.com",
+      "title": "Principal Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Speaker",
+      "imageUrl": "https://example.com/photos/priya-sharma.jpg"
+    }
+  ],
+  "slideDeck": ["https://example.com/slides/ai-agents-foundations.pdf"],
+  "recording": null,
+  "relatedPosters": ["proj-ai-research-assistant"],
+  "relatedPapers": ["https://arxiv.org/abs/2024.12345"],
+  "codeRepos": ["https://github.com/microsoft/agent-foundations"],
+  "otherLinks": [],
+  "keywords": ["agents", "foundation models", "LLM", "reasoning", "planning"],
+  "createdAt": "2026-01-12T00:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}

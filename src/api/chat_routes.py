@@ -66,6 +66,14 @@ def _get_required_env(name: str) -> str:
     """Get required environment variable."""
     value = os.getenv(name)
     if not value:
+        # Log as refusal for compliance
+        log_refusal(
+            refusal_reason="missing_configuration",
+            query_context=f"Config missing: {name}",
+            handler_name="chat_router",
+            user_id=None,
+            conversation_id=None
+        )
         raise HTTPException(status_code=500, detail=f"Missing configuration: {name}")
     return value.rstrip("/")
 
@@ -108,6 +116,17 @@ def _forward_stream(payload: ChatRequest) -> Generator[str, None, None]:
         if not resp.ok:
             detail = resp.text or resp.reason
             logger.error("Azure OpenAI request failed: %s %s", resp.status_code, detail)
+            
+            # Log as refusal if it's a content filter (400) or rate limit (429)
+            if resp.status_code in (400, 429):
+                log_refusal(
+                    refusal_reason="azure_openai_filter" if resp.status_code == 400 else "rate_limit",
+                    query_context=detail[:200],
+                    handler_name="azure_openai_forward",
+                    user_id=None,
+                    conversation_id=None
+                )
+            
             raise HTTPException(status_code=resp.status_code, detail=detail)
 
         for line in _iter_azure_stream(resp):

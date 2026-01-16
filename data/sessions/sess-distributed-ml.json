@@ -1,0 +1,31 @@
+{
+  "@odata.type": "#microsoft.graph.session",
+  "@odata.etag": "W/\"sess002\"",
+  "id": "sess-distributed-ml",
+  "eventId": "msri-tab-2026",
+  "title": "Scalable Training Infrastructure for Large Models",
+  "sessionType": "talk",
+  "description": "Novel distributed training techniques reducing GPU hours by 40% while maintaining model quality",
+  "startDateTime": "2026-01-24T11:00:00+05:30",
+  "endDateTime": "2026-01-24T11:45:00+05:30",
+  "location": "Room A-201",
+  "track": "Systems & Networking",
+  "speakers": [
+    {
+      "name": "Rajesh Kumar",
+      "email": "rajesh.kumar@microsoft.com",
+      "title": "Senior Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Speaker"
+    }
+  ],
+  "slideDeck": ["https://example.com/slides/distributed-ml.pdf"],
+  "recording": null,
+  "relatedPosters": ["proj-efficient-training"],
+  "relatedPapers": [],
+  "codeRepos": ["https://github.com/microsoft/distributed-ml-infra"],
+  "otherLinks": [],
+  "keywords": ["distributed systems", "training", "GPU optimization", "scalability"],
+  "createdAt": "2026-01-12T00:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}

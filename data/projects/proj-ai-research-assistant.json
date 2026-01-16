@@ -1,0 +1,39 @@
+{
+  "@odata.type": "#microsoft.graph.project",
+  "@odata.etag": "W/\"proj001\"",
+  "id": "proj-ai-research-assistant",
+  "eventId": "msri-tab-2026",
+  "name": "AI Research Assistant for Literature Review",
+  "description": "An agentic system that helps researchers discover, synthesize, and track relevant papers across domains using LLMs and knowledge graphs",
+  "researchArea": "Artificial Intelligence",
+  "posterUrl": "https://example.com/posters/ai-assistant.pdf",
+  "imageUrl": "https://example.com/images/ai-assistant-preview.jpg",
+  "location": "Booth 42",
+  "theme": "AI Tools",
+  "team": [
+    {
+      "name": "Alice Johnson",
+      "email": "alice.johnson@microsoft.com",
+      "title": "Research Intern",
+      "affiliation": "Microsoft Research India",
+      "role": "Lead"
+    },
+    {
+      "name": "Bob Chen",
+      "email": "bob.chen@microsoft.com",
+      "title": "Senior Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Mentor"
+    }
+  ],
+  "contactEmail": "alice.johnson@microsoft.com",
+  "videos": ["https://example.com/videos/ai-assistant-demo.mp4"],
+  "slides": ["https://example.com/slides/ai-assistant-overview.pdf"],
+  "papers": ["https://arxiv.org/abs/2024.12345"],
+  "codeRepos": ["https://github.com/microsoft/ai-research-assistant"],
+  "otherLinks": [],
+  "keywords": ["literature review", "knowledge graphs", "LLM", "research tools"],
+  "maturitySignal": "pilot-ready",
+  "createdAt": "2026-01-10T00:00:00Z",
+  "updatedAt": "2026-01-15T11:00:00Z"
+}

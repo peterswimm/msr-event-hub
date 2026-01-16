@@ -1,0 +1,23 @@
+{
+  "@odata.type": "#microsoft.graph.session",
+  "@odata.etag": "W/\"sess004\"",
+  "id": "sess-poster-session-1",
+  "eventId": "msri-tab-2026",
+  "title": "Poster Session: AI & Systems Research",
+  "sessionType": "posterSession",
+  "description": "Interactive poster presentations covering latest research in AI, machine learning systems, and distributed computing",
+  "startDateTime": "2026-01-24T15:30:00+05:30",
+  "endDateTime": "2026-01-24T17:00:00+05:30",
+  "location": "Atrium Hall",
+  "track": "Poster Sessions",
+  "speakers": [],
+  "slideDeck": [],
+  "recording": null,
+  "relatedPosters": ["proj-ai-research-assistant", "proj-efficient-training", "proj-vision-assist", "proj-quantum-crypto"],
+  "relatedPapers": [],
+  "codeRepos": [],
+  "otherLinks": [],
+  "keywords": ["posters", "interactive", "networking"],
+  "createdAt": "2026-01-12T00:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}

@@ -1,0 +1,27 @@
+{
+  "@odata.type": "#microsoft.graph.event",
+  "@odata.etag": "W/\"evt001\"",
+  "id": "msri-tab-2026",
+  "displayName": "MSR India Tech & Academic Board 2026",
+  "description": "Annual MSR India showcase featuring cutting-edge research in AI, systems, and human-computer interaction",
+  "eventType": "research_showcase",
+  "status": "published",
+  "startDate": "2026-01-24T09:00:00Z",
+  "endDate": "2026-01-24T18:00:00Z",
+  "timeZone": "Asia/Kolkata",
+  "location": "Microsoft India Development Center, Bangalore",
+  "tracks": [
+    "Artificial Intelligence",
+    "Systems & Networking",
+    "Human-Computer Interaction",
+    "Theory & Algorithms"
+  ],
+  "organizerEmail": "msri-events@microsoft.com",
+  "organizerName": "MSR India Events Team",
+  "imageUrl": "https://example.com/events/msri-tab-2026.jpg",
+  "registrationUrl": "https://example.com/register/msri-tab-2026",
+  "visibility": "internal",
+  "accessFlags": [],
+  "createdAt": "2026-01-10T00:00:00Z",
+  "updatedAt": "2026-01-15T12:00:00Z"
+}

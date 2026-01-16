@@ -1,0 +1,39 @@
+{
+  "@odata.type": "#microsoft.graph.project",
+  "@odata.etag": "W/\"proj003\"",
+  "id": "proj-vision-assist",
+  "eventId": "msri-tab-2026",
+  "name": "Vision Assist: Real-Time Scene Understanding for Low Vision Users",
+  "description": "Multimodal AI system providing real-time scene descriptions, object detection, and navigation guidance for users with visual impairments",
+  "researchArea": "Human-Computer Interaction",
+  "posterUrl": "https://example.com/posters/vision-assist.pdf",
+  "imageUrl": "https://example.com/images/vision-assist.jpg",
+  "location": "Booth 28",
+  "theme": "Accessibility",
+  "team": [
+    {
+      "name": "Ananya Desai",
+      "email": "ananya.desai@microsoft.com",
+      "title": "Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Lead"
+    },
+    {
+      "name": "Vikram Singh",
+      "email": "vikram.singh@microsoft.com",
+      "title": "UX Researcher",
+      "affiliation": "Microsoft Research India",
+      "role": "Contributor"
+    }
+  ],
+  "contactEmail": "ananya.desai@microsoft.com",
+  "videos": ["https://example.com/videos/vision-assist-user-study.mp4"],
+  "slides": [],
+  "papers": ["https://arxiv.org/abs/2024.54321"],
+  "codeRepos": [],
+  "otherLinks": ["https://aka.ms/vision-assist-demo"],
+  "keywords": ["accessibility", "computer vision", "assistive technology", "scene understanding"],
+  "maturitySignal": "pilot-ready",
+  "createdAt": "2026-01-10T00:00:00Z",
+  "updatedAt": "2026-01-15T11:00:00Z"
+}
