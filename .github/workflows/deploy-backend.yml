@@ -128,3 +128,4 @@ jobs:
           text: 'Backend deployment to ${{ steps.set-env.outputs.environment }}: ${{ job.status }}'
           webhook_url: ${{ secrets.SLACK_WEBHOOK }}
           fields: repo,message,commit,author
+

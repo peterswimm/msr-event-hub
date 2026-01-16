@@ -1,0 +1,189 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${title}",
+      "size": "large",
+      "weight": "bolder",
+      "color": "accent",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "${researchArea}",
+      "size": "small",
+      "spacing": "small",
+      "color": "accent"
+    },
+    {
+      "type": "TextBlock",
+      "text": "${description}",
+      "wrap": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "Container",
+      "separator": true,
+      "spacing": "medium",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Team",
+          "weight": "bolder",
+          "spacing": "small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${teamMembers}",
+          "wrap": true,
+          "spacing": "small"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "separator": true,
+      "spacing": "medium",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Project Details",
+          "weight": "bolder",
+          "spacing": "small"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Placement:",
+                  "weight": "bolder",
+                  "size": "small"
+                }
+              ]
+            },
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${placement}",
+                  "size": "small"
+                }
+              ]
+            }
+          ],
+          "spacing": "small"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Equipment:",
+                  "weight": "bolder",
+                  "size": "small"
+                }
+              ]
+            },
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${equipment}",
+                  "size": "small"
+                }
+              ]
+            }
+          ],
+          "spacing": "small"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Recording:",
+                  "weight": "bolder",
+                  "size": "small"
+                }
+              ]
+            },
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${recordingStatus}",
+                  "size": "small"
+                }
+              ]
+            }
+          ],
+          "spacing": "small"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Audience:",
+                  "weight": "bolder",
+                  "size": "small"
+                }
+              ]
+            },
+            {
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${targetAudience}",
+                  "size": "small",
+                  "wrap": true
+                }
+              ]
+            }
+          ],
+          "spacing": "small"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Back to Results",
+      "data": {
+        "action": "back_to_results",
+        "projectId": "${projectId}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Similar Projects",
+      "data": {
+        "action": "find_similar",
+        "projectId": "${projectId}",
+        "researchArea": "${researchArea}"
+      }
+    }
+  ],
+  "fallbackText": "Content unavailable. Try chat commands or refresh."
+}

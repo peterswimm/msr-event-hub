@@ -14,7 +14,12 @@ from contextlib import contextmanager
 from typing import Any, Dict, Optional
 from datetime import datetime
 
-from config import get_settings
+try:
+    from src.config.settings import get_settings
+except ImportError:
+    # Fallback if config not available
+    def get_settings():
+        return None
 
 logger = logging.getLogger(__name__)
 

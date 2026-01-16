@@ -17,7 +17,9 @@
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf web/*/node_modules"
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf web/*/node_modules",
+    "cards:lint": "node scripts/card_lint.mjs",
+    "cards:fix": "node scripts/card_lint.mjs --fix"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

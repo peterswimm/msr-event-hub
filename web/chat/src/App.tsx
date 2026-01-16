@@ -316,12 +316,16 @@ function App() {
   return (
     <ChatLayout
       header={
-        <>
-          <HamburgerMenu onMenuItemClick={handleMenuAction} />
-          <BrandHeader title={config.siteTitle!} feedbackUrl={import.meta.env.VITE_FEEDBACK_URL as string | undefined} onStop={handleStop} isStreaming={isStreaming} />
-        </>
+        <BrandHeader 
+          title={config.siteTitle!} 
+          feedbackUrl={import.meta.env.VITE_FEEDBACK_URL as string | undefined} 
+          onStop={handleStop} 
+          isStreaming={isStreaming}
+          hamburgerMenu={<HamburgerMenu onMenuItemClick={handleMenuAction} />}
+        />
       }
-      footer={<Footer />}
+      footer={<MessageInput onSend={handleSend} onClear={handleClear} disabled={isStreaming} disclaimer={config.aiDisclaimer} />}
+      linksFooter={<Footer />}
     >
       {!prefersHubProxy && !canStreamDirect ? (
         <div className="status-card warning">
@@ -381,8 +385,6 @@ function App() {
           </Tooltip>
         </div>
       ) : null}
-
-      <MessageInput onSend={handleSend} onClear={handleClear} disabled={isStreaming} disclaimer={config.aiDisclaimer} />
     </ChatLayout>
   );
 }

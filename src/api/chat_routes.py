@@ -13,12 +13,22 @@ import os
 import json
 from typing import Generator, Iterable, List, Optional, Dict, Any
 from datetime import datetime
+import time
 
 import requests
 from azure.identity import DefaultAzureCredential
 
 # Import action system to ensure handlers are registered
 from src.api import action_init  # noqa: F401
+from src.observability.telemetry import (
+    track_model_inference,
+    track_user_feedback,
+    track_event,
+    log_refusal,
+    log_edit_action,
+    track_event_visit,
+    track_connection_initiated
+)
 
 try:
     from fastapi import APIRouter, HTTPException
@@ -202,6 +212,14 @@ def get_chat_router():
             user_query = payload.messages[-1].content if payload.messages else ""
 
             if not user_query:
+                # Log as refusal for compliance (empty query)
+                log_refusal(
+                    refusal_reason="empty_query",
+                    query_context="",
+                    handler_name="chat_router",
+                    user_id=context.user_id if hasattr(context, "user_id") else None,
+                    conversation_id=getattr(context, "conversation_id", None)
+                )
                 raise HTTPException(status_code=400, detail="No query provided")
 
             # Extract conversation context
@@ -221,10 +239,27 @@ def get_chat_router():
             if card_action:
                 action_type = card_action.get("action")
                 logger.info(f"Processing card action: {action_type}")
+                start_time = time.time()
 
                 try:
                     result_text, result_card = await handle_card_action_unified(
                         action_type, card_action, context
+                    )
+                    
+                    duration_ms = (time.time() - start_time) * 1000
+                    
+                    # Track card action as feature usage
+                    track_event(
+                        "card_action",
+                        properties={
+                            "action_type": action_type,
+                            "conversation_id": context.conversation_id,
+                            "has_card": str(result_card is not None),
+                            "success": "true"
+                        },
+                        measurements={
+                            "duration_ms": duration_ms
+                        }
                     )
 
                     logger.info(f"Card action result: text='{result_text}', card={result_card is not None}")
@@ -256,6 +291,22 @@ def get_chat_router():
                     )
 
                 except Exception as e:
+                    duration_ms = (time.time() - start_time) * 1000
+                    
+                    # Track failed card action
+                    track_event(
+                        "card_action",
+                        properties={
+                            "action_type": action_type,
+                            "conversation_id": context.conversation_id,
+                            "success": "false",
+                            "error": str(e)
+                        },
+                        measurements={
+                            "duration_ms": duration_ms
+                        }
+                    )
+                    
                     logger.error(f"Card action processing failed: {e}", exc_info=True)
                     error_response = {
                         "delta": f"Error processing action: {str(e)}",
@@ -292,10 +343,18 @@ def get_chat_router():
 
             # Step 4: Fall back to Azure OpenAI for general queries
             logger.info("Using Azure OpenAI for low-confidence query")
+            start_time = time.time()
 
             if not os.getenv("AZURE_OPENAI_ENDPOINT") or not os.getenv(
                 "AZURE_OPENAI_DEPLOYMENT"
             ):
+                log_refusal(
+                    refusal_reason="service_unavailable",
+                    query_context=user_query[:200],
+                    handler_name="chat_routes_stream",
+                    user_id=getattr(context, "user_id", None),
+                    conversation_id=getattr(context, "conversation_id", None)
+                )
                 error_msg = (
                     "Azure OpenAI is not configured. To enable AI chat, set "
                     "AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_DEPLOYMENT in your .env file.\n\n"
@@ -310,8 +369,44 @@ def get_chat_router():
                     config_error_stream(), media_type="text/event-stream"
                 )
 
-            stream = _forward_stream(payload)
-            return StreamingResponse(stream, media_type="text/event-stream")
+            # Track model inference
+            deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "unknown")
+            prompt_tokens = sum(len(m.content.split()) for m in payload.messages)
+            
+            try:
+                stream = _forward_stream(payload)
+                
+                # Wrap stream to track completion
+                async def tracked_stream():
+                    completion_tokens = 0
+                    try:
+                        for chunk in stream:
+                            # Estimate tokens (rough approximation)
+                            if chunk.startswith("data: ") and not chunk.startswith("data: [DONE]"):
+                                completion_tokens += len(chunk.split()) // 4
+                            yield chunk
+                    finally:
+                        duration_ms = (time.time() - start_time) * 1000
+                        track_model_inference(
+                            model_name=deployment,
+                            prompt_tokens=prompt_tokens,
+                            completion_tokens=completion_tokens,
+                            latency_ms=duration_ms,
+                            success=True
+                        )
+                
+                return StreamingResponse(tracked_stream(), media_type="text/event-stream")
+            except Exception as e:
+                duration_ms = (time.time() - start_time) * 1000
+                track_model_inference(
+                    model_name=deployment,
+                    prompt_tokens=prompt_tokens,
+                    completion_tokens=0,
+                    latency_ms=duration_ms,
+                    success=False,
+                    error_type=type(e).__name__
+                )
+                raise
 
         except Exception as e:
             logger.error(f"Chat error: {e}")
@@ -321,6 +416,69 @@ def get_chat_router():
     async def chat_config():
         """Get chat service configuration and routing status."""
         from src.api.router_config import router_config
+        
+        return {
+            "available": True,
+            "routing_threshold": router_config.deterministic_threshold,
+            "azure_openai_configured": bool(
+                os.getenv("AZURE_OPENAI_ENDPOINT")
+                and os.getenv("AZURE_OPENAI_DEPLOYMENT")
+            ),
+        }
+    
+    class FeedbackRequest(BaseModel):
+        """User feedback model."""
+        conversation_id: str
+        message_id: str
+        rating: str = Field(pattern="^(positive|negative)$")
+        comment: Optional[str] = None
+        user_id: Optional[str] = None
+
+    class EventVisit(BaseModel):
+        """Event visit tracking payload."""
+        event_id: str
+        visit_type: str = Field(pattern="^(pre_event|post_event|during_event|general)$")
+        session_duration_seconds: Optional[float] = None
+        pages_viewed: Optional[int] = None
+        event_date: Optional[str] = None
+        user_id: Optional[str] = None
+
+    class ConnectionInitiated(BaseModel):
+        """Connection/lead initiation tracking payload."""
+        event_id: str
+        connection_type: str = Field(pattern="^(email_presenter|visit_repo|contact_organizer|linkedin|other)$")
+        target_id: Optional[str] = None
+        metadata: Optional[Dict[str, str]] = None
+        user_id: Optional[str] = None
+
+    class EditAction(BaseModel):
+        """AI edit/accept/reject action payload."""
+        conversation_id: str
+        message_id: str
+        action: str = Field(pattern="^(accept|edit|reject)$")
+        edit_percentage: Optional[float] = None
+        time_since_generation_ms: Optional[float] = None
+        user_id: Optional[str] = None
+    
+    @router.post("/feedback")
+    async def submit_feedback(feedback: FeedbackRequest):
+        """Submit user feedback for a chat interaction."""
+        try:
+            track_user_feedback(
+                conversation_id=feedback.conversation_id,
+                message_id=feedback.message_id,
+                rating=feedback.rating,
+                user_id=feedback.user_id,
+                comment=feedback.comment
+            )
+            
+            return {
+                "status": "success",
+                "message": "Feedback recorded"
+            }
+        except Exception as e:
+            logger.error(f"Failed to record feedback: {e}")
+            raise HTTPException(status_code=500, detail="Failed to record feedback")
 
         return {
             "provider": "hybrid",
@@ -344,6 +502,44 @@ def get_chat_router():
                 "foundry_configured": bool(router_config.foundry_endpoint),
             },
         }
+
+    @router.post("/telemetry/event-visit")
+    async def track_event_visit_endpoint(payload: EventVisit):
+        """Track pre/post/during event visits."""
+        track_event_visit(
+            event_id=payload.event_id,
+            user_id=payload.user_id,
+            visit_type=payload.visit_type,
+            session_duration_seconds=payload.session_duration_seconds,
+            pages_viewed=payload.pages_viewed,
+            event_date=payload.event_date,
+        )
+        return {"status": "ok"}
+
+    @router.post("/telemetry/connection")
+    async def track_connection_endpoint(payload: ConnectionInitiated):
+        """Track connection/lead initiation (email click, repo visit, contact)."""
+        track_connection_initiated(
+            event_id=payload.event_id,
+            user_id=payload.user_id,
+            connection_type=payload.connection_type,
+            target_id=payload.target_id,
+            metadata=payload.metadata,
+        )
+        return {"status": "ok"}
+
+    @router.post("/telemetry/edit-action")
+    async def track_edit_action_endpoint(payload: EditAction):
+        """Track AI response edit/accept/reject actions."""
+        log_edit_action(
+            conversation_id=payload.conversation_id,
+            message_id=payload.message_id,
+            action=payload.action,
+            user_id=payload.user_id,
+            edit_percentage=payload.edit_percentage,
+            time_since_generation_ms=payload.time_since_generation_ms,
+        )
+        return {"status": "ok"}
 
     @router.get("/actions")
     async def list_actions():

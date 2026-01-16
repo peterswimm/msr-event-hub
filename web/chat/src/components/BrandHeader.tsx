@@ -6,10 +6,17 @@ const useStyles = makeStyles({
   header: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     ...shorthands.padding(tokens.spacingVerticalM, tokens.spacingHorizontalL),
     ...shorthands.gap(tokens.spacingHorizontalM),
     backgroundColor: "transparent",
+    maxWidth: "800px",
+    width: "100%",
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  hamburger: {
+    display: "flex",
   },
   actions: {
     display: "flex",
@@ -22,9 +29,10 @@ type BrandHeaderProps = {
   feedbackUrl?: string;
   onStop?: () => void;
   isStreaming?: boolean;
+  hamburgerMenu?: React.ReactNode;
 };
 
-const BrandHeader = ({ title, feedbackUrl, onStop, isStreaming }: BrandHeaderProps) => {
+const BrandHeader = ({ title, feedbackUrl, onStop, isStreaming, hamburgerMenu }: BrandHeaderProps) => {
   const styles = useStyles();
   const [isSmall, setIsSmall] = useState(window.innerWidth < 600);
 
@@ -36,6 +44,9 @@ const BrandHeader = ({ title, feedbackUrl, onStop, isStreaming }: BrandHeaderPro
 
   return (
     <div className={styles.header}>
+      <div className={styles.hamburger}>
+        {hamburgerMenu}
+      </div>
       <div className={styles.actions}>
         {isStreaming ? (
           <Button appearance="secondary" onClick={onStop}>

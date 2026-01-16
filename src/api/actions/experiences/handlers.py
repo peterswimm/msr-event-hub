@@ -3,6 +3,8 @@
 import logging
 from typing import Dict, Any, Tuple, Optional
 
+from src.observability.telemetry import track_event
+
 from src.api.actions.base import BaseActionHandler
 from src.api.actions.decorators import register_action
 from src.api.actions.helpers import build_agenda_card, build_presenter_carousel
@@ -110,6 +112,17 @@ class BookmarkHandler(BaseActionHandler):
         try:
             item_type = payload.get("type", "item")
             item_id = payload.get("projectId") or payload.get("presenter") or payload.get("sessionId")
+
+            track_event(
+                "bookmark_action",
+                properties={
+                    "entity_type": item_type,
+                    "entity_id": str(item_id or "unknown"),
+                    "user_id": getattr(context, "user_id", "anonymous"),
+                    "conversation_id": getattr(context, "conversation_id", "N/A"),
+                    "action": "add"
+                }
+            )
 
             logger.info(f"Bookmark (stub): type={item_type}, id={item_id}")
 

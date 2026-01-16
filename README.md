@@ -398,6 +398,27 @@ cache.set("key", data, ttl_seconds=300)
 cache.toggle(False)
 
 # Clear specific entry
+
+---
+
+## 🃏 Adaptive Cards
+
+- Source of truth: `data/cards` contains all first-party card templates used by the app.
+- Viewer discovery: The VS Code Adaptive Cards extension will not index hidden folders; avoid `.data/cards` for active templates.
+- Samples: Legacy samples are mirrored under `data/cards/samples` for reference; many are not full Adaptive Cards (data-only).
+- Validation:
+  - Lint cards: `npm run cards:lint`
+  - Auto-fix safe issues: `npm run cards:fix`
+  - Include hidden folder (if needed): `node scripts/card_lint.mjs --include-dotdata --fix`
+- Common fixes applied:
+  - Enforce `$schema` = https schema
+  - Ensure `fallbackText` on root
+  - Add `altText` on `Image` elements
+  - Normalize `minHeight` formatting
+
+### Preview Tips
+- Open any JSON in `data/cards` and run “Adaptive Cards: Preview Card” from the Command Palette.
+- Consider renaming templates to `*.adaptivecard.json` for broader auto-discovery in some viewers.
 cache.invalidate("key")
 ```
 

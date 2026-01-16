@@ -7,7 +7,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     ...shorthands.gap(tokens.spacingVerticalS),
-    ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingHorizontalS),
+    ...shorthands.padding(tokens.spacingVerticalS, 0),
   },
   inputRow: {
     display: "flex",

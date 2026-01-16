@@ -13,6 +13,7 @@ from src.core.projects.exceptions import (
     RepositoryError,
     StorageError,
 )
+from src.observability.telemetry import telemetry_decorator
 
 
 class EventRepository(BaseRepository[Event]):
@@ -40,6 +41,7 @@ class EventRepository(BaseRepository[Event]):
         """Get the file path for an event."""
         return self.storage_dir / f"{event_id}.json"
 
+    @telemetry_decorator("create", "event")
     def create(self, event: Event) -> Event:
         """Create a new event."""
         event_path = self._get_event_path(event.id)
@@ -53,6 +55,7 @@ class EventRepository(BaseRepository[Event]):
         except Exception as e:
             raise StorageError("create", f"Cannot save event: {str(e)}")
 
+    @telemetry_decorator("read", "event")
     def get(self, event_id: str) -> Event:
         """Retrieve an event by ID."""
         event_path = self._get_event_path(event_id)
@@ -67,6 +70,7 @@ class EventRepository(BaseRepository[Event]):
         except Exception as e:
             raise StorageError("get", f"Cannot load event: {str(e)}")
 
+    @telemetry_decorator("update", "event")
     def update(self, event: Event) -> Event:
         """Update an existing event."""
         event_path = self._get_event_path(event.id)
@@ -83,6 +87,7 @@ class EventRepository(BaseRepository[Event]):
         except Exception as e:
             raise StorageError("update", f"Cannot update event: {str(e)}")
 
+    @telemetry_decorator("delete", "event")
     def delete(self, event_id: str) -> None:
         """Delete an event."""
         event_path = self._get_event_path(event_id)
@@ -95,6 +100,7 @@ class EventRepository(BaseRepository[Event]):
         except Exception as e:
             raise StorageError("delete", f"Cannot delete event: {str(e)}")
 
+    @telemetry_decorator("list", "event")
     def list_all(self) -> List[Event]:
         """List all events in the repository."""
         try:
@@ -152,6 +158,7 @@ class SessionRepository(BaseRepository[Session]):
         """Get the file path for a session."""
         return self.storage_dir / f"{session_id}.json"
 
+    @telemetry_decorator("create", "session")
     def create(self, session: Session) -> Session:
         """Create a new session."""
         session_path = self._get_session_path(session.id)
@@ -165,6 +172,7 @@ class SessionRepository(BaseRepository[Session]):
         except Exception as e:
             raise StorageError("create", f"Cannot save session: {str(e)}")
 
+    @telemetry_decorator("read", "session")
     def get(self, session_id: str) -> Session:
         """Retrieve a session by ID."""
         session_path = self._get_session_path(session_id)
@@ -179,6 +187,7 @@ class SessionRepository(BaseRepository[Session]):
         except Exception as e:
             raise StorageError("get", f"Cannot load session: {str(e)}")
 
+    @telemetry_decorator("update", "session")
     def update(self, session: Session) -> Session:
         """Update an existing session."""
         session_path = self._get_session_path(session.id)
@@ -195,6 +204,7 @@ class SessionRepository(BaseRepository[Session]):
         except Exception as e:
             raise StorageError("update", f"Cannot update session: {str(e)}")
 
+    @telemetry_decorator("delete", "session")
     def delete(self, session_id: str) -> None:
         """Delete a session."""
         session_path = self._get_session_path(session_id)
@@ -221,8 +231,7 @@ class SessionRepository(BaseRepository[Session]):
             return sessions
         except Exception as e:
             raise StorageError("list_all", f"Cannot list sessions: {str(e)}")
-
-    def list_by_event(self, event_id: str) -> List[Session]:
+    @telemetry_decorator("list", "session")    def list_by_event(self, event_id: str) -> List[Session]:
         """List all sessions for a specific event."""
         return [s for s in self.list_all() if s.event_id == event_id]
 

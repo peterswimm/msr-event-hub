@@ -18,6 +18,7 @@ from src.core.projects.exceptions import (
 from src.core.projects.models import ProjectDefinition
 from src.storage.base_repository import BaseRepository
 from src.storage.storage_manager import StorageManager
+from src.observability.telemetry import telemetry_decorator
 
 
 class ProjectRepository(BaseRepository[ProjectDefinition]):
@@ -57,6 +58,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         """Get the file path for a project."""
         return self.storage_dir / f"{project_id}.json"
     
+    @telemetry_decorator("create", "project")
     def create(self, project: ProjectDefinition) -> ProjectDefinition:
         """Create a new project.
         
@@ -86,6 +88,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         except Exception as e:
             raise StorageError("create", f"Cannot save project: {str(e)}")
     
+    @telemetry_decorator("read", "project")
     def get(self, project_id: str) -> ProjectDefinition:
         """Retrieve a project by ID.
         
@@ -113,6 +116,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         except Exception as e:
             raise StorageError("get", f"Cannot load project: {str(e)}")
     
+    @telemetry_decorator("update", "project")
     def update(self, project: ProjectDefinition) -> ProjectDefinition:
         """Update an existing project.
         
@@ -142,6 +146,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         except Exception as e:
             raise StorageError("update", f"Cannot update project: {str(e)}")
     
+    @telemetry_decorator("delete", "project")
     def delete(self, project_id: str) -> None:
         """Delete a project.
         
@@ -164,6 +169,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         except Exception as e:
             raise StorageError("delete", f"Cannot delete project: {str(e)}")
     
+    @telemetry_decorator("list", "project")
     def list_all(self) -> List[ProjectDefinition]:
         """List all projects in the repository.
         
@@ -187,6 +193,7 @@ class ProjectRepository(BaseRepository[ProjectDefinition]):
         except Exception as e:
             raise StorageError("list_all", f"Cannot list projects: {str(e)}")
     
+    @telemetry_decorator("list", "project")
     def list_by_event(self, event_id: str) -> List[ProjectDefinition]:
         """List all projects for a specific event (NEW: event-scoped access).
         

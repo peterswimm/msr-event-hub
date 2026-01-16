@@ -5,6 +5,7 @@ Tracks copilot operations, data access, and performance metrics
 
 import os
 import time
+import re
 from typing import Dict, Optional, Any
 from functools import wraps
 from datetime import datetime
@@ -20,6 +21,27 @@ except ImportError:
 
 # Global telemetry client
 _telemetry_client: Optional[Any] = None
+
+
+_PII_PATTERNS = [
+    re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", re.IGNORECASE),
+    re.compile(r"\b\+?\d[\d\s().-]{7,}\d\b"),
+    re.compile(r"https?://\S+", re.IGNORECASE),
+]
+
+
+def _sanitize_text(value: str, max_length: int = 200) -> str:
+    """Basic PII scrubbing and truncation before telemetry."""
+    if not value:
+        return ""
+
+    sanitized = value
+    for pattern in _PII_PATTERNS:
+        sanitized = pattern.sub("[redacted]", sanitized)
+
+    if len(sanitized) > max_length:
+        sanitized = sanitized[:max_length] + "…"
+    return sanitized
 
 
 def initialize_telemetry(instrumentation_key: Optional[str] = None) -> Optional[Any]:
@@ -206,7 +228,235 @@ def track_user_feedback(
             "message_id": message_id,
             "rating": rating,
             "user_id": user_id or "anonymous",
-            "has_comment": str(bool(comment))
+            "has_comment": str(bool(comment)),
+            "comment_sanitized": _sanitize_text(comment or "") if comment else ""
+        }
+    )
+
+
+def track_event_visit(
+    event_id: str,
+    user_id: Optional[str] = None,
+    visit_type: str = "general",  # "pre_event" | "post_event" | "during_event" | "general"
+    session_duration_seconds: Optional[float] = None,
+    pages_viewed: Optional[int] = None,
+    event_date: Optional[str] = None  # ISO format for timing analysis
+) -> None:
+    """
+    Track event page visits with timing context.
+    Differentiates pre/post event visits for KPI tracking.
+    
+    Args:
+        event_id: Event identifier
+        user_id: Optional user identifier
+        visit_type: Type of visit relative to event date
+        session_duration_seconds: Time spent on event page
+        pages_viewed: Number of pages viewed in session
+        event_date: Event date for relative timing calculation
+    """
+    track_event(
+        "event_visit",
+        properties={
+            "event_id": event_id,
+            "user_id": user_id or "anonymous",
+            "visit_type": visit_type,
+            "event_date": event_date or "unknown"
+        },
+        measurements={
+            "session_duration_seconds": session_duration_seconds or 0.0,
+            "pages_viewed": float(pages_viewed or 1)
+        }
+    )
+
+
+def track_connection_initiated(
+    event_id: str,
+    user_id: Optional[str],
+    connection_type: str,  # "email_presenter" | "visit_repo" | "contact_organizer" | "linkedin" | "other"
+    target_id: Optional[str] = None,
+    metadata: Optional[Dict[str, str]] = None
+) -> None:
+    """
+    Track connection/lead initiation events.
+    """
+    track_event(
+        "connection_initiated",
+        properties={
+            "event_id": event_id,
+            "user_id": user_id or "anonymous",
+            "connection_type": connection_type,
+            "target_id": target_id or "unknown",
+            **(metadata or {})
+        }
+    )
+
+def track_content_submission(
+    event_id: str,
+    presenter_id: str,
+    submission_type: str,  # "abstract" | "slides" | "video" | "bio" | "other"
+    file_size_bytes: Optional[int] = None,
+    file_format: Optional[str] = None,
+    submission_stage: str = "initial",  # "initial" | "revision" | "final"
+    success: bool = True,
+    error_message: Optional[str] = None
+) -> None:
+    """
+    Track presenter content submissions.
+    Monitors abstract/slides/video uploads for platform KPIs.
+    
+    Args:
+        event_id: Event identifier
+        presenter_id: Presenter user ID
+        submission_type: Type of content submitted
+        file_size_bytes: Size of uploaded file
+        file_format: File format (pdf, pptx, mp4, etc.)
+        submission_stage: Stage of submission workflow
+        success: Whether submission succeeded
+        error_message: Error details if failed
+    """
+    track_event(
+        "content_submission",
+        properties={
+            "event_id": event_id,
+            "presenter_id": presenter_id,
+            "submission_type": submission_type,
+            "file_format": file_format or "unknown",
+            "submission_stage": submission_stage,
+            "success": str(success),
+            "error_message": error_message or "none"
+        },
+        measurements={
+            "file_size_mb": float(file_size_bytes or 0) / (1024 * 1024)
+        }
+    )
+
+
+def track_admin_action(
+    admin_user_id: str,
+    action_type: str,  # "create_event" | "edit_event" | "delete_event" | "approve_content" | "send_notification" | "other"
+    entity_type: str,  # "event" | "session" | "user" | "project" | "artifact"
+    entity_id: str,
+    success: bool = True,
+    error_message: Optional[str] = None
+) -> None:
+    """
+    Track organizer/admin self-service actions.
+    Monitors platform KPI: organizer self-service rate.
+    
+    Args:
+        admin_user_id: Admin/organizer user ID
+        action_type: Type of administrative action
+        entity_type: Type of entity being modified
+        entity_id: Entity identifier
+        success: Whether action succeeded
+        error_message: Error details if failed
+    """
+    track_event(
+        "admin_action",
+        properties={
+            "admin_user_id": admin_user_id,
+            "action_type": action_type,
+            "entity_type": entity_type,
+            "entity_id": entity_id,
+            "success": str(success),
+            "error_message": error_message or "none",
+            "requires_support": str(not success)  # Failed actions may need support intervention
+        }
+    )
+
+
+def track_cross_event_interaction(
+    user_id: str,
+    source_event_id: str,
+    target_event_id: str,
+    interaction_type: str,  # "viewed_from_related" | "bookmarked_both" | "presenter_overlap" | "topic_similarity"
+    similarity_score: Optional[float] = None
+) -> None:
+    """
+    Track cross-event engagement patterns.
+    Monitors platform KPI: users engaging with multiple events.
+    
+    Args:
+        user_id: User identifier
+        source_event_id: Originating event ID
+        target_event_id: Destination event ID
+        interaction_type: Type of cross-event interaction
+        similarity_score: Similarity score between events (0-1)
+    """
+    track_event(
+        "cross_event_interaction",
+        properties={
+            "user_id": user_id,
+            "source_event_id": source_event_id,
+            "target_event_id": target_event_id,
+            "interaction_type": interaction_type
+        },
+        measurements={
+            "similarity_score": similarity_score or 0.0
+        }
+    )
+
+
+def log_refusal(
+    refusal_reason: str,
+    query_context: str,
+    handler_name: Optional[str] = None,
+    user_id: Optional[str] = None,
+    conversation_id: Optional[str] = None
+) -> None:
+    """
+    Log AI refusal for compliance tracking.
+
+    Args:
+        refusal_reason: Reason for refusal (policy, safety, missing citations)
+        query_context: User query or request context (truncated upstream)
+        handler_name: Handler or route where refusal occurred
+        user_id: Optional user identifier
+        conversation_id: Optional conversation identifier
+    """
+    track_event(
+        "ai_content_refusal",
+        properties={
+            "refusal_reason": refusal_reason,
+            "query_context": _sanitize_text(query_context),
+            "handler_name": handler_name or "unknown",
+            "user_id": user_id or "anonymous",
+            "conversation_id": conversation_id or "N/A"
+        }
+    )
+
+
+def log_edit_action(
+    conversation_id: str,
+    message_id: str,
+    action: str,
+    user_id: Optional[str] = None,
+    edit_percentage: Optional[float] = None,
+    time_since_generation_ms: Optional[float] = None
+) -> None:
+    """
+    Log edit/accept/reject actions for compliance metrics.
+
+    Args:
+        conversation_id: Conversation identifier
+        message_id: Message identifier
+        action: accept | edit | reject
+        user_id: Optional user identifier
+        edit_percentage: Percent difference between original and edited
+        time_since_generation_ms: Time from generation to action
+    """
+    track_event(
+        "ai_edit_action",
+        properties={
+            "conversation_id": conversation_id,
+            "message_id": message_id,
+            "action": action,
+            "user_id": user_id or "anonymous",
+            "has_significant_edit": str((edit_percentage or 0) > 10.0)
+        },
+        measurements={
+            "edit_percentage": edit_percentage or 0.0,
+            "time_since_generation_ms": time_since_generation_ms or 0.0
         }
     )
 

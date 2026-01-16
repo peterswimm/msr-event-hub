@@ -13,6 +13,7 @@ from src.core.projects.exceptions import (
     RepositoryError,
     StorageError,
 )
+from src.observability.telemetry import telemetry_decorator
 
 
 class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
@@ -40,6 +41,7 @@ class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
         """Get the file path for an artifact."""
         return self.storage_dir / f"{artifact_id}.json"
 
+    @telemetry_decorator("create", "artifact")
     def create(self, artifact: KnowledgeArtifact) -> KnowledgeArtifact:
         """Create a new knowledge artifact."""
         artifact_path = self._get_artifact_path(artifact.id)
@@ -53,6 +55,7 @@ class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
         except Exception as e:
             raise StorageError("create", f"Cannot save artifact: {str(e)}")
 
+    @telemetry_decorator("read", "artifact")
     def get(self, artifact_id: str) -> KnowledgeArtifact:
         """Retrieve an artifact by ID."""
         artifact_path = self._get_artifact_path(artifact_id)
@@ -67,6 +70,7 @@ class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
         except Exception as e:
             raise StorageError("get", f"Cannot load artifact: {str(e)}")
 
+    @telemetry_decorator("update", "artifact")
     def update(self, artifact: KnowledgeArtifact) -> KnowledgeArtifact:
         """Update an existing artifact."""
         artifact_path = self._get_artifact_path(artifact.id)
@@ -83,6 +87,7 @@ class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
         except Exception as e:
             raise StorageError("update", f"Cannot update artifact: {str(e)}")
 
+    @telemetry_decorator("delete", "artifact")
     def delete(self, artifact_id: str) -> None:
         """Delete an artifact."""
         artifact_path = self._get_artifact_path(artifact_id)
@@ -95,6 +100,7 @@ class KnowledgeArtifactRepository(BaseRepository[KnowledgeArtifact]):
         except Exception as e:
             raise StorageError("delete", f"Cannot delete artifact: {str(e)}")
 
+    @telemetry_decorator("list", "artifact")
     def list_all(self) -> List[KnowledgeArtifact]:
         """List all artifacts."""
         try:
@@ -160,6 +166,7 @@ class PublishedKnowledgeRepository(BaseRepository[PublishedKnowledge]):
         """Get the file path for published knowledge."""
         return self.storage_dir / f"{knowledge_id}.json"
 
+    @telemetry_decorator("create", "published_knowledge")
     def create(self, knowledge: PublishedKnowledge) -> PublishedKnowledge:
         """Create a new published knowledge entry."""
         knowledge_path = self._get_knowledge_path(knowledge.id)
@@ -173,6 +180,7 @@ class PublishedKnowledgeRepository(BaseRepository[PublishedKnowledge]):
         except Exception as e:
             raise StorageError("create", f"Cannot save knowledge: {str(e)}")
 
+    @telemetry_decorator("read", "published_knowledge")
     def get(self, knowledge_id: str) -> PublishedKnowledge:
         """Retrieve published knowledge by ID."""
         knowledge_path = self._get_knowledge_path(knowledge_id)
@@ -187,6 +195,7 @@ class PublishedKnowledgeRepository(BaseRepository[PublishedKnowledge]):
         except Exception as e:
             raise StorageError("get", f"Cannot load knowledge: {str(e)}")
 
+    @telemetry_decorator("update", "published_knowledge")
     def update(self, knowledge: PublishedKnowledge) -> PublishedKnowledge:
         """Update published knowledge."""
         knowledge_path = self._get_knowledge_path(knowledge.id)
@@ -203,6 +212,7 @@ class PublishedKnowledgeRepository(BaseRepository[PublishedKnowledge]):
         except Exception as e:
             raise StorageError("update", f"Cannot update knowledge: {str(e)}")
 
+    @telemetry_decorator("delete", "published_knowledge")
     def delete(self, knowledge_id: str) -> None:
         """Delete published knowledge."""
         knowledge_path = self._get_knowledge_path(knowledge_id)
@@ -215,6 +225,7 @@ class PublishedKnowledgeRepository(BaseRepository[PublishedKnowledge]):
         except Exception as e:
             raise StorageError("delete", f"Cannot delete knowledge: {str(e)}")
 
+    @telemetry_decorator("list", "published_knowledge")
     def list_all(self) -> List[PublishedKnowledge]:
         """List all published knowledge."""
         try:
