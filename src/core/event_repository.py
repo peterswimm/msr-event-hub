@@ -231,7 +231,9 @@ class SessionRepository(BaseRepository[Session]):
             return sessions
         except Exception as e:
             raise StorageError("list_all", f"Cannot list sessions: {str(e)}")
-    @telemetry_decorator("list", "session")    def list_by_event(self, event_id: str) -> List[Session]:
+
+    @telemetry_decorator("list", "session")
+    def list_by_event(self, event_id: str) -> List[Session]:
         """List all sessions for a specific event."""
         return [s for s in self.list_all() if s.event_id == event_id]
 

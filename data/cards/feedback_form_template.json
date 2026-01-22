@@ -1,0 +1,138 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "fallbackText": "Feedback form for Project Green 2026 event. Share your experience and suggestions.",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Event Feedback",
+          "size": "large",
+          "weight": "bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Help us improve future events",
+          "size": "small",
+          "spacing": "none",
+          "isSubtle": true
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Your feedback is valuable and will be reviewed by the event planning team.",
+      "wrap": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "Input.Text",
+      "id": "attendeeName",
+      "label": "Name (Optional)",
+      "placeholder": "Your name",
+      "maxLength": 100
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "overallRating",
+      "label": "Overall Experience *",
+      "style": "compact",
+      "isRequired": true,
+      "errorMessage": "Please rate your experience",
+      "choices": [
+        {
+          "title": "⭐⭐⭐⭐⭐ Excellent",
+          "value": "5"
+        },
+        {
+          "title": "⭐⭐⭐⭐ Good",
+          "value": "4"
+        },
+        {
+          "title": "⭐⭐⭐ Average",
+          "value": "3"
+        },
+        {
+          "title": "⭐⭐ Below Average",
+          "value": "2"
+        },
+        {
+          "title": "⭐ Poor",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "favoriteAspects",
+      "label": "What did you enjoy most? (Select all that apply)",
+      "style": "expanded",
+      "isMultiSelect": true,
+      "choices": [
+        {
+          "title": "Research project demos",
+          "value": "demos"
+        },
+        {
+          "title": "Networking opportunities",
+          "value": "networking"
+        },
+        {
+          "title": "Technical presentations",
+          "value": "presentations"
+        },
+        {
+          "title": "Interactive sessions",
+          "value": "interactive"
+        },
+        {
+          "title": "Venue and facilities",
+          "value": "venue"
+        }
+      ]
+    },
+    {
+      "type": "Input.Text",
+      "id": "suggestions",
+      "label": "Suggestions for Improvement",
+      "placeholder": "What could we do better?",
+      "isMultiline": true,
+      "maxLength": 500
+    },
+    {
+      "type": "Input.Toggle",
+      "id": "attendNextYear",
+      "title": "Would you attend again next year?",
+      "value": "true"
+    },
+    {
+      "type": "Container",
+      "$when": "$data.attendNextYear == false",
+      "items": [
+        {
+          "type": "Input.Text",
+          "id": "reasonNotAttending",
+          "label": "What would make you more likely to attend?",
+          "placeholder": "Tell us what would change your mind",
+          "isMultiline": true,
+          "maxLength": 300
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit Feedback",
+      "data": {
+        "action": "submitFeedback",
+        "timestamp": "${timestamp}"
+      },
+      "style": "positive"
+    }
+  ]
+}

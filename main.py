@@ -26,9 +26,12 @@ except ImportError:
     pass  # python-dotenv not installed, skip
 
 try:
-    from fastapi import FastAPI, Depends
+    from fastapi import FastAPI, Depends, Request
     from fastapi.responses import JSONResponse, FileResponse
     from fastapi.staticfiles import StaticFiles
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
     HAS_FASTAPI = True
 except ImportError:
     HAS_FASTAPI = False
@@ -41,9 +44,21 @@ from src.api.projects_routes import get_projects_router
 from src.api.knowledge_routes import get_knowledge_router
 from src.api.workflow_routes import get_workflow_router
 from src.api.chat_routes import get_chat_router
-from src.workflows.project_executor import ProjectExecutor
-from src.workflows.iteration_controller import IterationController
-from src.evaluation.hybrid_evaluator import HybridEvaluator
+EVAL_ENABLED = os.getenv("ENABLE_EVALUATION", "0") == "1"
+try:
+    if EVAL_ENABLED:
+        from src.workflows.project_executor import ProjectExecutor  # type: ignore
+        from src.workflows.iteration_controller import IterationController  # type: ignore
+        from src.evaluation.hybrid_evaluator import HybridEvaluator  # type: ignore
+    else:
+        ProjectExecutor = None  # type: ignore
+        IterationController = None  # type: ignore
+        HybridEvaluator = None  # type: ignore
+except Exception:
+    # Gracefully degrade if evaluation stack isn't available
+    ProjectExecutor = None  # type: ignore
+    IterationController = None  # type: ignore
+    HybridEvaluator = None  # type: ignore
 from src.api.action_init import initialize_action_handlers
 from src.observability.telemetry import (
     initialize_telemetry,
@@ -79,19 +94,26 @@ class ApplicationContext:
         self.published_repo = PublishedKnowledgeRepository(storage_dir=self.storage_root / "published")
         
         # Initialize workflow components
-        self.evaluator = HybridEvaluator()
-        self.executor = ProjectExecutor(
-            repository=self.project_repo,
-            evaluator=self.evaluator,
-            max_iterations=2
-        )
-        self.iteration_controller = IterationController(
-            executor=self.executor,
-            max_iterations=2
-        )
-        
+        # Initialize workflow components only if evaluation stack is enabled
+        if HybridEvaluator and ProjectExecutor and IterationController:
+            self.evaluator = HybridEvaluator()
+            self.executor = ProjectExecutor(
+                repository=self.project_repo,
+                evaluator=self.evaluator,
+                max_iterations=2
+            )
+            self.iteration_controller = IterationController(
+                executor=self.executor,
+                max_iterations=2
+            )
+            logger.info("✓ Workflow components (ProjectExecutor, IterationController) initialized")
+        else:
+            self.evaluator = None
+            self.executor = None
+            self.iteration_controller = None
+            logger.info("↪ Evaluation stack disabled (set ENABLE_EVALUATION=1 to enable)")
+
         logger.info(f"✓ Application context initialized with storage root: {self.storage_root}")
-        logger.info(f"✓ Workflow components (ProjectExecutor, IterationController) initialized")
 
     def get_health_status(self) -> dict:
         """Get health status of all repositories."""
@@ -127,6 +149,14 @@ def create_app(storage_root: Optional[Path] = None) -> Optional[FastAPI]:
     # Initialize telemetry
     initialize_telemetry(os.getenv("APPINSIGHTS_INSTRUMENTATION_KEY"))
 
+    # Initialize rate limiter (DOSA compliance: fail-closed)
+    limiter = Limiter(
+        key_func=get_remote_address,
+        default_limits=["100/minute", "1000/hour"],
+        storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://"),
+        strategy="fixed-window"
+    )
+
     app = FastAPI(
         title="MSR Event Hub API",
         description="Event-scoped knowledge management with hybrid query routing and multi-agent orchestration",
@@ -134,6 +164,45 @@ def create_app(storage_root: Optional[Path] = None) -> Optional[FastAPI]:
         docs_url="/docs",
         openapi_url="/openapi.json"
     )
+    
+    # Add rate limiter to app state
+    app.state.limiter = limiter
+    
+    # Add rate limit exceeded handler with telemetry
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+        """Handle rate limit exceeded with DOSA fail-closed + telemetry."""
+        from src.observability.telemetry import track_event, log_refusal
+        
+        # Log rate limit for compliance
+        log_refusal(
+            refusal_reason="rate_limit_exceeded",
+            query_context=f"{request.method} {request.url.path}",
+            handler_name="rate_limiter",
+            user_id=request.headers.get("x-user-id"),
+            conversation_id=request.headers.get("x-conversation-id")
+        )
+        
+        # Track rate limit event
+        track_event(
+            "rate_limit_exceeded",
+            properties={
+                "path": request.url.path,
+                "method": request.method,
+                "remote_addr": get_remote_address(request),
+                "user_agent": request.headers.get("user-agent", ""),
+            }
+        )
+        
+        return JSONResponse(
+            status_code=429,
+            content={
+                "error": "Rate limit exceeded",
+                "message": "Too many requests. Please slow down and try again later.",
+                "retry_after": exc.detail
+            },
+            headers={"Retry-After": str(exc.detail)}
+        )
     
     # Telemetry middleware
     @app.middleware("http")

@@ -328,3 +328,54 @@ html.dark .adaptive-card-container .ac-pushButton:hover {
 .adaptive-card-container .ac-columnSet {
   margin-bottom: 12px;
 }
+
+/* Feedback buttons */
+.feedback-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.feedback-btn {
+  background: transparent;
+  border: 1px solid #E1E1E1;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-btn:hover:not(:disabled) {
+  background: #F5F5F5;
+  transform: scale(1.1);
+}
+
+.feedback-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+html.dark .feedback-btn {
+  border-color: #3F3F3F;
+}
+
+html.dark .feedback-btn:hover:not(:disabled) {
+  background: #2A2A2A;
+}
+
+.feedback-thank-you {
+  color: #107C10;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+  display: inline-block;
+}
+
+html.dark .feedback-thank-you {
+  color: #92C353;
+}

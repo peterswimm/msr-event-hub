@@ -24,23 +24,62 @@ _telemetry_client: Optional[Any] = None
 
 
 _PII_PATTERNS = [
+    # Email addresses
     re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", re.IGNORECASE),
+    # Phone numbers (various formats)
     re.compile(r"\b\+?\d[\d\s().-]{7,}\d\b"),
+    # URLs
     re.compile(r"https?://\S+", re.IGNORECASE),
+    # Credit card numbers (Visa, MC, Amex, Discover)
+    re.compile(r"\b(?:\d{4}[-\s]?){3}\d{4}\b"),
+    # Social Security Numbers (US format: XXX-XX-XXXX)
+    re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
+    # IP addresses (IPv4 and IPv6)
+    re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
+    re.compile(r"\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b"),
+    # Driver's license numbers (various US states, simplified)
+    re.compile(r"\b[A-Z]{1,2}\d{5,8}\b"),
+    # Passport numbers (alphanumeric, 6-9 characters)
+    re.compile(r"\b[A-Z0-9]{6,9}\b(?=\s*(passport|travel))", re.IGNORECASE),
+    # Account numbers (bank, credit)
+    re.compile(r"\b(?:account|acct)[\s#:]*\d{4,}\b", re.IGNORECASE),
+    # API keys and tokens (long alphanumeric strings)
+    re.compile(r"\b[A-Za-z0-9]{32,}\b"),
+    # Personal names (enhanced - simple heuristic: Title + Capitalized words)
+    re.compile(r"\b(Mr|Ms|Mrs|Dr|Prof)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b"),
+    # Dates of birth (MM/DD/YYYY, DD-MM-YYYY)
+    re.compile(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"),
+    # Medical record numbers
+    re.compile(r"\b(?:MRN|medical\s+record)[\s#:]*\d{5,}\b", re.IGNORECASE),
 ]
 
 
 def _sanitize_text(value: str, max_length: int = 200) -> str:
-    """Basic PII scrubbing and truncation before telemetry."""
+    """Enhanced PII scrubbing with multiple pattern detection."""
     if not value:
         return ""
 
     sanitized = value
+    
+    # Apply each PII pattern
     for pattern in _PII_PATTERNS:
-        sanitized = pattern.sub("[redacted]", sanitized)
+        sanitized = pattern.sub("[REDACTED]", sanitized)
+    
+    # Additional context-aware sanitization
+    # Redact anything that looks like a key-value pair with sensitive keywords
+    sensitive_keywords = [
+        "password", "passwd", "pwd", "secret", "token", "api_key", "apikey",
+        "auth", "credential", "ssn", "social", "dob", "birthdate", "license"
+    ]
+    
+    for keyword in sensitive_keywords:
+        # Match patterns like "password: value" or "password=value"
+        pattern = re.compile(rf"\b{keyword}[\s:=]+\S+", re.IGNORECASE)
+        sanitized = pattern.sub(f"{keyword}=[REDACTED]", sanitized)
 
     if len(sanitized) > max_length:
         sanitized = sanitized[:max_length] + "…"
+    
     return sanitized
 
 

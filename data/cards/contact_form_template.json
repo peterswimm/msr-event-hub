@@ -1,0 +1,141 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "fallbackText": "Contact form for reaching out to research team: ${teamName}",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Contact ${teamName}",
+          "size": "large",
+          "weight": "bolder",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "${projectTitle}",
+          "size": "medium",
+          "color": "accent",
+          "spacing": "none",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Send a message to the research team",
+      "wrap": true,
+      "spacing": "medium"
+    },
+    {
+      "type": "Input.Text",
+      "id": "name",
+      "label": "Your Name *",
+      "placeholder": "Enter your full name",
+      "isRequired": true,
+      "errorMessage": "Please enter your name",
+      "maxLength": 100
+    },
+    {
+      "type": "Input.Text",
+      "id": "email",
+      "label": "Email Address *",
+      "placeholder": "your.email@microsoft.com",
+      "style": "Email",
+      "isRequired": true,
+      "errorMessage": "Please enter a valid email address",
+      "maxLength": 200
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "inquiryType",
+      "label": "Inquiry Type",
+      "style": "compact",
+      "value": "general",
+      "choices": [
+        {
+          "title": "General Question",
+          "value": "general"
+        },
+        {
+          "title": "Collaboration Interest",
+          "value": "collaboration"
+        },
+        {
+          "title": "Demo Request",
+          "value": "demo"
+        },
+        {
+          "title": "Technical Details",
+          "value": "technical"
+        }
+      ]
+    },
+    {
+      "type": "Input.Text",
+      "id": "message",
+      "label": "Message *",
+      "placeholder": "What would you like to know?",
+      "isMultiline": true,
+      "isRequired": true,
+      "errorMessage": "Please enter a message",
+      "maxLength": 500
+    },
+    {
+      "type": "Input.Toggle",
+      "id": "followUp",
+      "title": "I would like to receive follow-up information",
+      "value": "true"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Send Message",
+      "data": {
+        "action": "submitContact",
+        "projectId": "${projectId}"
+      },
+      "style": "positive"
+    },
+    {
+      "type": "Action.ShowCard",
+      "title": "Preview",
+      "card": {
+        "type": "AdaptiveCard",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "Message Preview",
+            "weight": "bolder"
+          },
+          {
+            "type": "FactSet",
+            "facts": [
+              {
+                "title": "From:",
+                "value": "{{name.value}}"
+              },
+              {
+                "title": "Email:",
+                "value": "{{email.value}}"
+              },
+              {
+                "title": "Type:",
+                "value": "{{inquiryType.value}}"
+              },
+              {
+                "title": "Message:",
+                "value": "{{message.value}}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

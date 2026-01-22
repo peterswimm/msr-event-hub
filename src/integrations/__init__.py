@@ -6,23 +6,35 @@ Includes:
 - Power Platform connectors (Power Automate, Power Apps, Power BI)
 """
 
-# Microsoft 365
-from .m365_connector import M365KnowledgeConnector, M365ConnectorError, create_connector
-from .m365_schemas import M365SourceMetadata, M365ArtifactExtension
+# Microsoft 365 (optional - requires graph_auth module)
+try:
+    from .m365_connector import M365KnowledgeConnector, M365ConnectorError, create_connector
+    from .m365_schemas import M365SourceMetadata, M365ArtifactExtension
+except ImportError as e:
+    import warnings
+    warnings.warn(f"M365 integration unavailable: {e}")
 
 # Azure AI Foundry
-from .foundry_provider import AzureAIFoundryProvider, FoundryModelRegistry, create_foundry_provider
-from .foundry_integration import FoundryAgentIntegration, FoundryEvaluation
+try:
+    from .foundry_provider import AzureAIFoundryProvider, FoundryModelRegistry, create_foundry_provider
+    from .foundry_integration import FoundryAgentIntegration, FoundryEvaluation
+except ImportError as e:
+    import warnings
+    warnings.warn(f"Foundry integration unavailable: {e}")
 
-# Power Platform
-from .power_platform_connector import (
-    create_power_platform_connector,
-    ExtractionRequest,
-    ExtractionResponse,
-    ArtifactItem,
-    ArtifactSearchResult,
-    FeedbackRequest
-)
+# Power Platform (optional - requires FastAPI)
+try:
+    from .power_platform_connector import (
+        create_power_platform_connector,
+        ExtractionRequest,
+        ExtractionResponse,
+        ArtifactItem,
+        ArtifactSearchResult,
+        FeedbackRequest
+    )
+except ImportError as e:
+    import warnings
+    warnings.warn(f"Power Platform integration unavailable: {e}")
 
 # Extended Settings
 from .extended_settings import (

@@ -17,13 +17,25 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 import json
 
+logger = logging.getLogger(__name__)
+
 # Add parent directory to path for EventKit imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from graph_auth import GraphAuthClient, GraphAuthError
-from settings import Settings
+try:
+    from graph_auth import GraphAuthClient, GraphAuthError
+except ImportError:
+    # Use stub for M365 integration until full implementation
+    from .graph_auth_stub import GraphAuthClient, GraphAuthError
+    logger.warning("Using stub GraphAuthClient - full M365 integration not available")
 
-logger = logging.getLogger(__name__)
+try:
+    from settings import Settings
+except ImportError:
+    # Create minimal Settings stub if not available
+    class Settings:
+        pass
+    logger.warning("Using stub Settings")
 
 
 class M365ConnectorError(Exception):

@@ -12,22 +12,27 @@ from typing import Optional, Dict, Any, List
 from datetime import datetime
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 try:
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
+    logger.warning("FastAPI not available - Power Platform integration will not be functional")
+    # Stub BaseModel for type hints when FastAPI unavailable
+    class BaseModel:  # type: ignore
+        pass
 
-logger = logging.getLogger(__name__)
 
+# ========== Pydantic Models (only defined if FastAPI available) ==========
 
-# ========== Pydantic Models ==========
-
-class ExtractionRequest(BaseModel):
-    """Power Automate extraction request"""
-    artifact_type: str  # 'paper', 'talk', 'repository'
-    source_location: str
+if FASTAPI_AVAILABLE:
+    class ExtractionRequest(BaseModel):
+        """Power Automate extraction request"""
+        artifact_type: str  # 'paper', 'talk', 'repository'
+        source_location: str
     save_results: bool = True
     notify_teams: bool = False
     team_id: Optional[str] = None

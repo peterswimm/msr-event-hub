@@ -241,14 +241,16 @@ INTENT_PATTERNS = {
         r"\bpresentation[s]?\s+(at|on|by)"
     ],
     "project_search": [
-        r"\bprojects?\s+(about|related|on)\b",
-        r"\bposters?\s+(about|related|on)\b",
-        r"\bshow\s+me\s+projects?\b",
+        r"\bprojects?\s+(about|related|on|regarding|concerning|for)\b",
+        r"\bposters?\s+(about|related|on|regarding|concerning|for)\b",
+        r"\b(show|display|find|list|get)\s+me\s+projects?\b",
         r"\bfind\s+(project|poster)\b",
-        r"\bsearch\s+(project|poster)\b",
+        r"\bsearch\s+(for\s+)?projects?\b",
         r"\bhelp\s+me\s+find\s+projects?\b",
         r"\bprojects?\s+that\s+match\b",
         r"\binterests\b.*\bproject\b",
+        r"\blooking\s+for\s+projects?\b",
+        r"\bprojects?\s+(in|under|within)\s+\w+\b",
         r"\blist\s+(all\s+)?(artificial\s+intelligence|AI|systems|networking|machine\s+learning)\s+projects?\b"
     ],
     "project_detail": [
@@ -329,6 +331,51 @@ INTENT_PATTERNS = {
         r"\bstart\s+time\b",
         r"\bworkflow\b",
         r"\bstatus\s+field\b"
+    ],
+    # New high-priority intents
+    "time_based_schedule": [
+        r"\b(what'?s|what\s+is)\s+(happening|on)\s+(now|next|today|tomorrow)\b",
+        r"\bcurrent\s+(session|presentation|talk|demo)\b",
+        r"\bup\s+next\b",
+        r"\bcoming\s+up\b",
+        r"\bthis\s+(morning|afternoon|evening|hour)\b",
+        r"\bschedule\s+for\s+(today|tomorrow)\b",
+        r"\bat\s+\d{1,2}:\d{2}\b"  # "What's at 2:30?"
+    ],
+    "related_projects": [
+        r"\brelated\s+projects?\b",
+        r"\bsimilar\s+(to|projects?)\b",
+        r"\blike\s+this\s+project\b",
+        r"\bmore\s+projects?\s+like\b",
+        r"\balso\s+interested\s+in\b",
+        r"\bother\s+projects?\s+in\s+this\s+area\b",
+        r"\byou\s+might\s+also\s+like\b"
+    ],
+    "personalized_recommendations": [
+        r"\brecommend\b.*\bproject",
+        r"\bsuggest\b.*\bproject",
+        r"\bwhat\s+should\s+i\s+(see|visit|check\s+out)\b",
+        r"\bbased\s+on\s+my\s+interest",
+        r"\bprojects?\s+(for|about)\s+me\b",
+        r"\bpersonalized\s+(list|suggestions?)\b",
+        r"\bi'?m\s+interested\s+in\b"
+    ],
+    "trending_popular": [
+        r"\bmost\s+popular\b",
+        r"\btrending\b",
+        r"\bhot\s+topics?\b",
+        r"\bmost\s+viewed\b",
+        r"\bhighest\s+rated\b",
+        r"\bbest\s+projects?\b",
+        r"\btop\s+\d+\s+projects?\b",
+        r"\bmust[-\s]see\b"
+    ],
+    "multi_criteria_search": [
+        r"\bprojects?\s+(with|that\s+have)\b.*\band\b.*\b(in|at|with)\b",
+        r"\bboth\b.*\band\b",
+        r"\ball\s+projects?\s+that\b.*\b(and|also|plus)\b",
+        r"\b(filter|narrow)\s+by\b.*\band\b",
+        r"\bwith\s+multiple\b.*\brequirements?\b"
     ]
 }
 

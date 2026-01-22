@@ -1,6 +1,7 @@
 """Handlers for new chat experiences: agenda, presenters, bookmarks, synthesis, organizer tools."""
 
 import logging
+import os
 from typing import Dict, Any, Tuple, Optional
 
 from src.observability.telemetry import track_event
@@ -131,6 +132,151 @@ class BookmarkHandler(BaseActionHandler):
 
         except Exception as e:
             logger.error(f"Error in bookmark handler: {e}", exc_info=True)
+            raise
+
+
+@register_action(
+    "speaker_contact",
+    description="Show contact information for a speaker/presenter",
+)
+class SpeakerContactHandler(BaseActionHandler):
+    """Handler for speaker_contact action - returns speaker details and links."""
+
+    async def execute(
+        self, payload: Dict[str, Any], context: Any
+    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        try:
+            name = (payload.get("name") or "").strip().lower()
+            if not name:
+                return "Please specify a speaker name.", None
+
+            event_data = get_event_data()
+            sessions = event_data.get("sessions", [])
+
+            # Find first matching speaker across sessions
+            for sess in sessions:
+                for sp in sess.get("speakers", []):
+                    sp_name = (sp.get("name") or sp.get("displayName") or "").strip().lower()
+                    if sp_name and name in sp_name:
+                        email = sp.get("email") or "Unavailable"
+                        title = sp.get("title") or ""
+                        affiliation = sp.get("affiliation") or ""
+                        profile = sp.get("profileUrl") or ""
+                        msg = f"{sp.get('name')}: {title} — {affiliation}\nEmail: {email}"
+                        if profile:
+                            msg += f"\nProfile: {profile}"
+                        return msg, None
+
+            return f"I couldn't find contact details for '{payload.get('name')}'.", None
+
+        except Exception as e:
+            logger.error(f"Error in speaker_contact handler: {e}", exc_info=True)
+            raise
+
+
+@register_action(
+    "download_poster_pdf",
+    description="Provide a direct download link to the poster PDF",
+)
+class DownloadPosterPDFHandler(BaseActionHandler):
+    """Handler for download_poster_pdf action."""
+
+    async def execute(
+        self, payload: Dict[str, Any], context: Any
+    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        try:
+            project_id = payload.get("projectId")
+            if not project_id:
+                return "Please specify which poster to download.", None
+
+            event_data = get_event_data()
+            projects = event_data.get("projects", [])
+            for p in projects:
+                if p.get("id") == project_id:
+                    pdf = p.get("posterUrl")
+                    if pdf:
+                        return f"Here is the poster PDF:\n{pdf}", None
+                    return "This project doesn't have a poster PDF yet.", None
+
+            return "I couldn't find that project.", None
+        except Exception as e:
+            logger.error(f"Error in download_poster_pdf handler: {e}", exc_info=True)
+            raise
+
+
+@register_action(
+    "share_item",
+    description="Provide a shareable link for a session or project",
+)
+class ShareItemHandler(BaseActionHandler):
+    """Handler for share_item action."""
+
+    async def execute(
+        self, payload: Dict[str, Any], context: Any
+    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        try:
+            entity_id = payload.get("projectId") or payload.get("sessionId")
+            if not entity_id:
+                return "Please specify what you want to share.", None
+
+            # For MVP, construct a simple internal link pattern
+            base = os.getenv("EVENT_SITE_BASE_URL", "https://events.microsoft.com/msr")
+            return f"Shareable link:\n{base}/item/{entity_id}", None
+        except Exception as e:
+            logger.error(f"Error in share_item handler: {e}", exc_info=True)
+            raise
+
+
+@register_action(
+    "report_issue",
+    description="Open a feedback form to report an issue",
+)
+class ReportIssueHandler(BaseActionHandler):
+    """Handler for report_issue action."""
+
+    async def execute(
+        self, payload: Dict[str, Any], context: Any
+    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        try:
+            form_url = os.getenv("EVENT_FEEDBACK_URL", "https://forms.office.com/r/example")
+            return (
+                "You can report an issue using our feedback form:",
+                {
+                    "type": "AdaptiveCard",
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "version": "1.5",
+                    "body": [
+                        {"type": "TextBlock", "text": "Report an issue", "weight": "bolder", "size": "medium"},
+                        {"type": "TextBlock", "text": "Help us improve the event experience.", "isSubtle": True}
+                    ],
+                    "actions": [
+                        {"type": "Action.OpenUrl", "title": "Open feedback form", "url": form_url}
+                    ]
+                }
+            )
+        except Exception as e:
+            logger.error(f"Error in report_issue handler: {e}", exc_info=True)
+            raise
+
+
+@register_action(
+    "contact_organizer",
+    description="Show organizer contact information",
+)
+class ContactOrganizerHandler(BaseActionHandler):
+    """Handler for contact_organizer action."""
+
+    async def execute(
+        self, payload: Dict[str, Any], context: Any
+    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        try:
+            event_data = get_event_data()
+            event = event_data.get("event") or {}
+            email = event.get("organizerEmail") or os.getenv("EVENT_ORGANIZER_EMAIL", "msri-events@microsoft.com")
+            name = event.get("organizerName") or "Event Organizer"
+            return f"{name}: {email}", None
+        except Exception as e:
+            logger.error(f"Error in contact_organizer handler: {e}", exc_info=True)
             raise
 
 

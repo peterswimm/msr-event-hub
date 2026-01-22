@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Card, Text, makeStyles, tokens } from "@fluentui/react-components";
 import { ChevronLeft24Regular, ChevronRight24Regular } from "@fluentui/react-icons";
 
@@ -100,6 +100,47 @@ const ProjectCarousel: React.FC<ProjectCarouselProps> = ({
 }) => {
   const styles = useStyles();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const projectCardRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard navigation support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!containerRef.current?.contains(document.activeElement)) {
+        return; // Only handle keys when carousel is focused
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          handlePrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          handleNext();
+          break;
+        case 'Home':
+          e.preventDefault();
+          setCurrentIndex(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          setCurrentIndex(projects.length - 1);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [projects.length]);
+
+  // Announce slide changes to screen readers
+  useEffect(() => {
+    if (projectCardRef.current) {
+      // Focus management for accessibility
+      projectCardRef.current.focus();
+    }
+  }, [currentIndex]);
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : projects.length - 1));
@@ -126,10 +167,18 @@ const ProjectCarousel: React.FC<ProjectCarouselProps> = ({
     .join(", ") || "No team info";
 
   return (
-    <div className={styles.container} role="region" aria-label="Project carousel">
+    <div 
+      ref={containerRef}
+      className={styles.container} 
+      role="region" 
+      aria-label={`Project carousel: ${title}`}
+      aria-roledescription="carousel"
+    >
       <div className={styles.header}>
-        <Text className={styles.title}>{title}</Text>
-        {subtitle && <Text className={styles.subtitle}>{subtitle}</Text>}
+        <Text className={styles.title} as="h2" id="carousel-title">{title}</Text>
+        {subtitle && (
+          <Text className={styles.subtitle} id="carousel-subtitle">{subtitle}</Text>
+        )}
       </div>
 
       <Card className={styles.carouselWrapper}>
@@ -138,54 +187,72 @@ const ProjectCarousel: React.FC<ProjectCarouselProps> = ({
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           role="group"
           aria-live="polite"
+          aria-atomic="true"
+          aria-labelledby="carousel-title"
+          aria-describedby="carousel-subtitle"
         >
           {projects.map((project, idx) => (
-            <div key={idx} className={styles.projectCard}>
+            <div 
+              key={idx} 
+              ref={idx === currentIndex ? projectCardRef : null}
+              className={styles.projectCard}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`Project ${idx + 1} of ${projects.length}: ${project.name || 'Untitled Project'}`}
+              tabIndex={idx === currentIndex ? 0 : -1}
+            >
               <Text className={styles.projectTitle} as="h3">
                 {project.name || "Untitled Project"}
               </Text>
               {project.researchArea && (
-                <Text className={styles.projectArea}>{project.researchArea}</Text>
+                <Text className={styles.projectArea} aria-label={`Research area: ${project.researchArea}`}>
+                  {project.researchArea}
+                </Text>
               )}
               <Text className={styles.projectDescription}>
                 {project.description?.slice(0, 200) || "Description unavailable"}
                 {(project.description?.length || 0) > 200 && "..."}
               </Text>
-              <Text className={styles.projectTeam}>👥 {teamText}</Text>
+              <Text className={styles.projectTeam} aria-label={`Team members: ${teamText}`}>
+                👥 {teamText}
+              </Text>
             </div>
           ))}
         </div>
 
-        <div className={styles.controls}>
+        <div className={styles.controls} role="group" aria-label="Carousel navigation controls">
           <div className={styles.navButtons}>
             <Button
               appearance="subtle"
               icon={<ChevronLeft24Regular />}
               onClick={handlePrevious}
               disabled={projects.length <= 1}
-              aria-label="Previous project"
+              aria-label={`Previous project (${currentIndex > 0 ? projects[currentIndex - 1].name : projects[projects.length - 1].name})`}
+              title="Previous project (Arrow Left)"
             />
             <Button
               appearance="subtle"
               icon={<ChevronRight24Regular />}
               onClick={handleNext}
               disabled={projects.length <= 1}
-              aria-label="Next project"
+              aria-label={`Next project (${currentIndex < projects.length - 1 ? projects[currentIndex + 1].name : projects[0].name})`}
+              title="Next project (Arrow Right)"
             />
           </div>
-          <Text className={styles.counter}>
-            {currentIndex + 1} of {projects.length}
+          <Text className={styles.counter} role="status" aria-live="polite">
+            Project {currentIndex + 1} of {projects.length}
           </Text>
         </div>
       </Card>
 
       {actions && actions.length > 0 && (
-        <div className={styles.actions}>
+        <div className={styles.actions} role="group" aria-label="Project actions">
           {actions.map((action, idx) => (
             <Button
               key={idx}
               appearance={idx === 0 ? "primary" : "secondary"}
               onClick={() => handleActionClick(action.data)}
+              aria-label={action.title}
             >
               {action.title}
             </Button>

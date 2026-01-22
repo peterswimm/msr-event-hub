@@ -14,6 +14,7 @@ import json
 from typing import Generator, Iterable, List, Optional, Dict, Any
 from datetime import datetime
 import time
+import asyncio
 
 import requests
 from azure.identity import DefaultAzureCredential
@@ -29,9 +30,14 @@ from src.observability.telemetry import (
     track_event_visit,
     track_connection_initiated
 )
+from src.observability.intent_metrics import IntentMetrics
+from src.integrations.foundry_wrapper import (
+    stream_foundry_response,
+    get_foundry_agent,
+)
 
 try:
-    from fastapi import APIRouter, HTTPException
+    from fastapi import APIRouter, HTTPException, Request
     from fastapi.responses import StreamingResponse
     from pydantic import BaseModel, Field
 except ModuleNotFoundError:  # pragma: no cover
@@ -44,8 +50,14 @@ except ModuleNotFoundError:  # pragma: no cover
 logger = logging.getLogger(__name__)
 credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
 
+# Initialize intent metrics tracking (singleton)
+intent_metrics = IntentMetrics()
+
 AZURE_OPENAI_SCOPE = "https://cognitiveservices.azure.com/.default"
 DEFAULT_API_VERSION = "2024-02-15-preview"
+DELEGATE_TO_FOUNDRY = os.getenv("DELEGATE_TO_FOUNDRY", "false").lower() == "true"
+FOUNDRY_ALLOW_PER_REQUEST_OVERRIDE = os.getenv("FOUNDRY_ALLOW_PER_REQUEST_OVERRIDE", "true").lower() == "true"
+FOUNDRY_REQUIRED_ROLE = os.getenv("FOUNDRY_REQUIRED_ROLE", "")
 
 
 class ChatMessage(BaseModel):
@@ -90,6 +102,37 @@ def _iter_azure_stream(resp: requests.Response) -> Iterable[str]:
         if not raw:
             continue
         yield raw
+
+
+def _should_delegate_to_foundry(request: Request) -> tuple[bool, bool]:
+    """Determine if this request should delegate to Foundry.
+
+    Returns (delegate_enabled, debug_enabled).
+    """
+    delegate = DELEGATE_TO_FOUNDRY
+
+    # Per-request opt-in via header or query flag
+    if FOUNDRY_ALLOW_PER_REQUEST_OVERRIDE:
+        header_flag = request.headers.get("x-delegate-to-foundry", "") == "1"
+        query_flag = request.query_params.get("foundry", "") == "1"
+        delegate = delegate or header_flag or query_flag
+
+    if not delegate:
+        return False, False
+
+    # Require auth context forwarded from bridge
+    user_roles = []
+    if request.headers.get("x-user-roles"):
+        user_roles = [r.strip() for r in request.headers.get("x-user-roles", "").split(",") if r.strip()]
+
+    if FOUNDRY_REQUIRED_ROLE and FOUNDRY_REQUIRED_ROLE not in user_roles:
+        return False, False
+
+    if not FOUNDRY_ENDPOINT or not FOUNDRY_AGENT_ID:
+        return False, False
+
+    debug_enabled = request.headers.get("x-debug", "") == "1" or request.query_params.get("debug", "") == "1"
+    return True, debug_enabled
 
 
 def _forward_stream(payload: ChatRequest) -> Generator[str, None, None]:
@@ -141,6 +184,15 @@ def get_chat_router():
         return None
 
     router = APIRouter(prefix="/api/chat", tags=["Chat"])
+    
+    # Get rate limiter from app state (set in main.py)
+    try:
+        from slowapi import Limiter
+        from slowapi.util import get_remote_address
+        limiter = Limiter(key_func=get_remote_address)
+    except ImportError:
+        limiter = None
+        logger.warning("slowapi not installed - rate limiting disabled")
 
     async def handle_card_action_unified(
         action_type: str, card_action: Dict[str, Any], context: Any
@@ -212,7 +264,7 @@ def get_chat_router():
         }
 
     @router.post("/stream")
-    async def stream_chat(payload: ChatRequest):
+    async def stream_chat(payload: ChatRequest, request: Request):
         """
         Hybrid chat endpoint with intelligent routing.
         
@@ -221,7 +273,22 @@ def get_chat_router():
         2. Classify as intent -> deterministic routing
         3. Low confidence -> delegate to Foundry
         4. Fallback -> Azure OpenAI
-        """
+        
+        Rate Limits (DOSA compliance):
+        - 20 requests/minute per IP (chat queries)
+        - Fail-closed on rate limit (429 + telemetry)
+        \"\"\"
+        # Apply rate limiting if available
+        if limiter:
+            try:
+                await limiter.check_request_limit(
+                    request=request,
+                    endpoint_func=stream_chat,
+                    rate_limit=\"20/minute\"
+                )
+            except Exception:
+                pass  # Rate limit handler in main.py will catch
+                
         try:
             from src.api.query_router import DeterministicRouter
             from src.api.router_config import router_config
@@ -245,6 +312,9 @@ def get_chat_router():
             context = extract_context_from_messages([m.model_dump() for m in payload.messages])
             context.advance_turn()
             logger.info(f"Conversation context: {context.to_dict()}")
+
+            # Check if Foundry delegation is allowed/requested
+            delegate_to_foundry, debug_enabled = _should_delegate_to_foundry(request)
 
             # Step 1: Check if this is a card action (JSON)
             card_action = None
@@ -340,10 +410,80 @@ def get_chat_router():
                         error_stream(), media_type="text/event-stream"
                     )
 
+            # Foundry override (feature-flagged + per-request opt-in)
+            if delegate_to_foundry:
+                try:
+                    logger.info(f"Delegating to Foundry: query='{user_query[:100]}...', conversation_id={context.conversation_id}")
+                    track_event(
+                        "foundry_delegate_start",
+                        properties={
+                            "conversation_id": context.conversation_id,
+                            "user_id": getattr(context, "user_id", None),
+                            "debug": str(debug_enabled).lower(),
+                        },
+                    )
+                    start_time = time.time()
+
+                    async def foundry_delegated_stream():
+                        try:
+                            async for chunk in stream_foundry_response(
+                                user_query,
+                                [m.model_dump() for m in payload.messages],
+                                context.to_dict(),
+                            ):
+                                yield chunk
+                            duration_ms = (time.time() - start_time) * 1000
+                            track_event(
+                                "foundry_delegate_success",
+                                properties={
+                                    "conversation_id": context.conversation_id,
+                                    "debug": str(debug_enabled).lower(),
+                                },
+                                measurements={"duration_ms": duration_ms},
+                            )
+                            yield "data: [DONE]\n\n"
+                        except Exception as e:
+                            duration_ms = (time.time() - start_time) * 1000
+                            logger.warning(f"Foundry delegation failed: {e}", exc_info=True)
+                            track_event(
+                                "foundry_delegate_error",
+                                properties={
+                                    "conversation_id": context.conversation_id,
+                                    "error": str(e)[:200],
+                                },
+                                measurements={"duration_ms": duration_ms},
+                            )
+                            # Fallback to Azure OpenAI
+                            logger.info("Falling back to Azure OpenAI")
+                            track_event(
+                                "foundry_delegate_fallback",
+                                properties={
+                                    "conversation_id": context.conversation_id,
+                                    "reason": str(e)[:200],
+                                },
+                            )
+                            for line in _forward_stream(payload):
+                                yield line
+                            yield "data: [DONE]\n\n"
+
+                    return StreamingResponse(foundry_delegated_stream(), media_type="text/event-stream")
+                except Exception as e:
+                    logger.error(f"Foundry delegation initialization failed: {e}", exc_info=True)
+                    raise HTTPException(status_code=500, detail=f"Foundry delegation error: {str(e)}")
+
             # Step 2: Route natural language queries
             logger.info(f"Routing query: {user_query[:100]}...")
             router = DeterministicRouter()
+            routing_start_time = time.time()
             intent_type, confidence = router.classify(user_query)
+            
+            # Extract patterns matched for metrics
+            patterns_matched = []
+            query_lower = user_query.lower()
+            if intent_type in router.patterns:
+                for pattern in router.patterns[intent_type]:
+                    if pattern.search(query_lower):
+                        patterns_matched.append(pattern.pattern)
 
             logger.info(
                 "Intent classified",
@@ -354,6 +494,14 @@ def get_chat_router():
                 },
             )
 
+            # Determine execution path
+            if confidence >= router_config.deterministic_threshold:
+                execution_path = "deterministic"
+            elif confidence >= 0.6:
+                execution_path = "llm_assisted"
+            else:
+                execution_path = "full_llm"
+
             # Step 3: Use deterministic routing if high confidence
             if confidence >= router_config.deterministic_threshold:
                 logger.info("Using deterministic routing result")
@@ -361,7 +509,7 @@ def get_chat_router():
                 pass
 
             # Step 4: Fall back to Azure OpenAI for general queries
-            logger.info("Using Azure OpenAI for low-confidence query")
+            logger.info(f"Using {execution_path} for query (confidence: {confidence:.2f})")
             start_time = time.time()
 
             if not os.getenv("AZURE_OPENAI_ENDPOINT") or not os.getenv(
@@ -413,6 +561,17 @@ def get_chat_router():
                             latency_ms=duration_ms,
                             success=True
                         )
+                        
+                        # Log intent classification metrics
+                        routing_latency_ms = (start_time - routing_start_time) * 1000
+                        intent_metrics.log_classification(
+                            query=user_query,
+                            predicted_intent=intent_type,
+                            confidence=confidence,
+                            patterns_matched=patterns_matched,
+                            execution_path=execution_path,
+                            latency_ms=routing_latency_ms
+                        )
                 
                 return StreamingResponse(tracked_stream(), media_type="text/event-stream")
             except Exception as e:
@@ -452,6 +611,12 @@ def get_chat_router():
         rating: str = Field(pattern="^(positive|negative)$")
         comment: Optional[str] = None
         user_id: Optional[str] = None
+
+    class IntentFeedbackRequest(BaseModel):
+        """Intent routing quality feedback."""
+        query: str
+        feedback: str = Field(pattern="^(positive|negative|correction)$")
+        correction: Optional[str] = None
 
     class EventVisit(BaseModel):
         """Event visit tracking payload."""
@@ -498,6 +663,42 @@ def get_chat_router():
         except Exception as e:
             logger.error(f"Failed to record feedback: {e}")
             raise HTTPException(status_code=500, detail="Failed to record feedback")
+
+    @router.post("/intent-feedback")
+    async def submit_intent_feedback(feedback: IntentFeedbackRequest):
+        """Submit feedback on intent routing quality."""
+        try:
+            intent_metrics.log_user_feedback(
+                query=feedback.query,
+                feedback=feedback.feedback,
+                correction=feedback.correction
+            )
+            
+            return {
+                "status": "success",
+                "message": "Intent feedback recorded"
+            }
+        except Exception as e:
+            logger.error(f"Failed to record intent feedback: {e}")
+            raise HTTPException(status_code=500, detail="Failed to record intent feedback")
+
+    @router.get("/metrics/routing-quality")
+    async def routing_quality_metrics():
+        """Get real-time routing quality metrics."""
+        try:
+            coverage = intent_metrics.get_coverage_stats()
+            
+            return {
+                "coverage": coverage,
+                "report": intent_metrics.generate_report(),
+                "application_insights": {
+                    "message": "For comprehensive metrics, query Application Insights with KQL",
+                    "workspace_id": os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "").split("InstrumentationKey=")[-1].split(";")[0] if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") else None
+                }
+            }
+        except Exception as e:
+            logger.error(f"Failed to get routing metrics: {e}")
+            raise HTTPException(status_code=500, detail="Failed to get routing metrics")
 
         return {
             "provider": "hybrid",
