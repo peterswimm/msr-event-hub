@@ -28,7 +28,8 @@ from src.observability.telemetry import (
     log_refusal,
     log_edit_action,
     track_event_visit,
-    track_connection_initiated
+    track_connection_initiated,
+    track_fallback_event
 )
 from src.observability.intent_metrics import IntentMetrics
 from src.integrations.foundry_wrapper import (
@@ -193,6 +194,49 @@ def get_chat_router():
     except ImportError:
         limiter = None
         logger.warning("slowapi not installed - rate limiting disabled")
+
+    def _stream_fallback_message(query: str, context: Any, session_id: str = "fallback"):
+        """Stream a graceful fallback message with core chat abilities."""
+        from src.observability.telemetry import track_fallback_event
+        
+        # Log the fallback event
+        track_fallback_event(
+            original_query=query,
+            session_id=session_id,
+            foundry_attempt=delegate_to_foundry,
+            foundry_failed_reason="foundry_attempt_failed" if delegate_to_foundry else "foundry_disabled",
+            conversation_turn=getattr(context, "turn_count", 1),
+            user_id=getattr(context, "user_id", None),
+            deterministic_confidence=0.0
+        )
+        
+        # Fallback message with core 4 abilities
+        fallback_text = """I'm having trouble understanding that query. Let me help you with what I can do:
+
+• **Find research projects** – Search for events by topic, category, or keyword
+• **Search for people** – Look up speakers, organizers, and team members  
+• **Check event details** – Browse sessions, schedules, and event information
+• **Equipment & logistics** – Find presentation requirements and resource information
+
+Try rewording your question or ask me about any of these topics!"""
+        
+        # Track the fallback event with intent metrics
+        intent_metrics.log_fallback(
+            query=query,
+            session_id=session_id,
+            foundry_attempted=delegate_to_foundry,
+            foundry_failed_reason="foundry_attempt_failed" if delegate_to_foundry else "foundry_disabled",
+            conversation_turn=getattr(context, "turn_count", 1)
+        )
+        
+        # Stream as SSE
+        response = {
+            "delta": fallback_text,
+            "context": context.to_dict(),
+            "fallback": True
+        }
+        yield f"data: {json.dumps(response)}\n\n"
+        yield "data: [DONE]\n\n"
 
     async def handle_card_action_unified(
         action_type: str, card_action: Dict[str, Any], context: Any
@@ -480,7 +524,7 @@ def get_chat_router():
             # Extract patterns matched for metrics
             patterns_matched = []
             query_lower = user_query.lower()
-            if intent_type in router.patterns:
+            if intent_type in router.patterns and intent_type != "unmatched":
                 for pattern in router.patterns[intent_type]:
                     if pattern.search(query_lower):
                         patterns_matched.append(pattern.pattern)
@@ -501,6 +545,74 @@ def get_chat_router():
                 execution_path = "llm_assisted"
             else:
                 execution_path = "full_llm"
+
+            # === FALLBACK HANDLING ===
+            # If query doesn't match any deterministic patterns, attempt Foundry silently
+            # Only show fallback message if Foundry fails or is disabled
+            if intent_type == "unmatched":
+                logger.info(f"Query matched no deterministic patterns, attempting Foundry escalation")
+                execution_path = "fallback_attempt"
+                
+                # Try Foundry if enabled and configured
+                if delegate_to_foundry:
+                    try:
+                        logger.info(f"[Fallback Flow] Attempting Foundry for unmatched query")
+                        start_time = time.time()
+                        
+                        async def fallback_with_foundry_stream():
+                            """Attempt Foundry first, show fallback only on failure."""
+                            foundry_failed = False
+                            foundry_error = None
+                            
+                            try:
+                                async for chunk in stream_foundry_response(
+                                    user_query,
+                                    [m.model_dump() for m in payload.messages],
+                                    context.to_dict(),
+                                ):
+                                    yield chunk
+                                duration_ms = (time.time() - start_time) * 1000
+                                logger.info(f"[Fallback Flow] Foundry succeeded in {duration_ms:.0f}ms")
+                                track_event(
+                                    "fallback_foundry_success",
+                                    properties={
+                                        "conversation_id": context.conversation_id,
+                                        "original_query_length": str(len(user_query)),
+                                    },
+                                    measurements={"duration_ms": duration_ms}
+                                )
+                                yield "data: [DONE]\n\n"
+                            except Exception as e:
+                                foundry_failed = True
+                                foundry_error = str(e)
+                                duration_ms = (time.time() - start_time) * 1000
+                                logger.warning(f"[Fallback Flow] Foundry failed: {e}")
+                                track_event(
+                                    "fallback_foundry_failed",
+                                    properties={
+                                        "conversation_id": context.conversation_id,
+                                        "error": str(e)[:200],
+                                    },
+                                    measurements={"duration_ms": duration_ms}
+                                )
+                                
+                                # Show graceful fallback message
+                                yield from _stream_fallback_message(user_query, context, session_id="unmatched_foundry_failed")
+                        
+                        return StreamingResponse(fallback_with_foundry_stream(), media_type="text/event-stream")
+                    except Exception as e:
+                        logger.error(f"[Fallback Flow] Foundry initialization failed: {e}")
+                        # Show fallback message
+                        async def fallback_error_stream():
+                            yield from _stream_fallback_message(user_query, context, session_id="foundry_init_failed")
+                        return StreamingResponse(fallback_error_stream(), media_type="text/event-stream")
+                
+                else:
+                    # Foundry not enabled, show fallback directly
+                    logger.info(f"[Fallback Flow] Foundry disabled, showing fallback message")
+                    async def fallback_disabled_stream():
+                        yield from _stream_fallback_message(user_query, context, session_id="foundry_disabled")
+                    return StreamingResponse(fallback_disabled_stream(), media_type="text/event-stream")
 
             # Step 3: Use deterministic routing if high confidence
             if confidence >= router_config.deterministic_threshold:

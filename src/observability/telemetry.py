@@ -436,6 +436,52 @@ def track_cross_event_interaction(
     )
 
 
+def track_fallback_event(
+    original_query: str,
+    session_id: str,
+    foundry_attempt: bool,
+    foundry_failed_reason: Optional[str] = None,
+    conversation_turn: int = 0,
+    user_id: Optional[str] = None,
+    deterministic_confidence: float = 0.0
+) -> None:
+    """
+    Track fallback events when queries don't match deterministic intents.
+    
+    This event occurs when:
+    - Query matches no deterministic patterns (confidence 0.0)
+    - Foundry escalation is attempted (foundry_attempt=True)
+    - Foundry escalation fails and user gets fallback message
+    - Foundry is disabled (foundry_attempt=False, foundry_failed_reason="foundry_disabled")
+    
+    Used to identify conversations that hit fallback and improve intent coverage.
+    
+    Args:
+        original_query: The query that triggered fallback
+        session_id: Session identifier for grouping fallback events
+        foundry_attempt: Whether Foundry was attempted (True) or disabled (False)
+        foundry_failed_reason: Reason Foundry failed (timeout, empty_response, error, foundry_disabled)
+        conversation_turn: Turn number in conversation (1-indexed)
+        user_id: Optional user identifier
+        deterministic_confidence: Confidence score before fallback (should be ~0.0)
+    """
+    track_event(
+        "fallback_event",
+        properties={
+            "original_query": _sanitize_text(original_query, max_length=300),
+            "session_id": session_id,
+            "foundry_attempt": str(foundry_attempt),
+            "foundry_failed_reason": foundry_failed_reason or "none",
+            "user_id": user_id or "anonymous",
+            "occurrence_point": "post_foundry_failure" if foundry_attempt else "foundry_disabled"
+        },
+        measurements={
+            "conversation_turn": float(conversation_turn),
+            "deterministic_confidence": deterministic_confidence
+        }
+    )
+
+
 def log_refusal(
     refusal_reason: str,
     query_context: str,

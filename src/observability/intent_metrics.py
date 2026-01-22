@@ -81,6 +81,25 @@ class IntentMetrics:
                 "corrected_intent": correction or "",
             }
         )
+    
+    def log_fallback(
+        self,
+        query: str,
+        session_id: str,
+        foundry_attempted: bool,
+        foundry_failed_reason: Optional[str] = None,
+        conversation_turn: int = 0
+    ):
+        """Log when query hits the fallback message after exhausting all routing attempts."""
+        from src.observability.telemetry import track_fallback_event
+        
+        track_fallback_event(
+            original_query=query,
+            session_id=session_id,
+            foundry_attempt=foundry_attempted,
+            foundry_failed_reason=foundry_failed_reason,
+            conversation_turn=conversation_turn
+        )
         
     def get_coverage_stats(self) -> Dict[str, Any]:
         """Get recent coverage statistics from in-memory data."""

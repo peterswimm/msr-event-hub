@@ -62,6 +62,8 @@ class DeterministicRouter:
 
         Returns:
             Tuple of (intent_name, confidence_score)
+            - ("unmatched", 0.0) if query matches no deterministic patterns
+            - (intent_name, confidence) for matched intents
         """
         query_lower = query.lower()
         intent_scores = {}
@@ -75,7 +77,7 @@ class DeterministicRouter:
                 intent_scores[intent] = confidence
 
         if not intent_scores:
-            return ("project_search", 0.3)  # Default fallback
+            return ("unmatched", 0.0)  # Explicit unmatched intent, zero confidence
 
         # Return highest scoring intent
         best_intent = max(intent_scores.items(), key=lambda x: x[1])
